@@ -75,6 +75,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}
 td,th{padding:7px 4px;border-bottom:1px solid var(--bd);text-align:left}
 th{color:var(--mt);font-weight:600;font-size:12px}
 td.n,th.n{text-align:right}
+.pw{position:relative}.pw input{padding-right:84px}.eye{position:absolute;right:6px;top:9px;height:34px;padding:0 10px;background:var(--pn2);color:var(--tx);border:1px solid var(--bd);border-radius:8px;font:600 13px system-ui;cursor:pointer}
 </style>
 </head>
 <body>
@@ -105,6 +106,8 @@ const CORES=[['Amarelo','#ffdf00'],['Verde','#2fd675'],['Azul','#7fb2ff'],['Bran
 /* ---------- nuvem (Firebase): cada time isolado, gravação campo a campo, tempo real ---------- */
 firebase.initializeApp({apiKey:"AIzaSyBEz4IV_JeKn142dg0x2ZkP9-dQh38pZts",authDomain:"resenha-fc-4ed8f.firebaseapp.com",projectId:"resenha-fc-4ed8f",storageBucket:"resenha-fc-4ed8f.firebasestorage.app",messagingSenderId:"1064006149833",appId:"1:1064006149833:web:1606c3b1c024cd228e4f18"});
 const auth=firebase.auth(),fs=firebase.firestore(),FV=firebase.firestore.FieldValue;
+const VER=3,NOVID=[[3,'13/11/2026',['Botão para ver a senha enquanto digita','Aba Sugestões: mande ideias para o desenvolvedor','Painel do desenvolvedor','Novidades e aviso de versão nova','Compartilhar o link do app']],[2,'13/11/2026',['App publicado na internet, com os dados na nuvem em tempo real','Recuperação de senha por e-mail']],[1,'12/11/2026',['Primeira versão: mensalidade com comprovante, caixa, jogos, presença, gols, notas, cartões por votação, avisos, chat, linha do tempo e sorteador']]];
+let SUG=null,DEV=null,UPD=false;
 const COLS=['pagamentos','caixa','jogos','avisos','chat','timeline','cartoes'],CORE=['nome','mens','venc','vagas','regras'];
 let ME=null,T=null,SH=null,MY=[],unsub=[],BOOT=true,LOADING=false,PEND=null,BUSY=false;
 let UI={tab:'inicio',sub:null,jogo:null,auth:'login',modal:null,mes:mk(Date.now()),busca:''};
@@ -112,7 +115,7 @@ const J=x=>JSON.stringify(x),clone=x=>JSON.parse(JSON.stringify(x)),isObj=x=>x&&
 const tref=()=>fs.collection('teams').doc(T.id);
 const erro=e=>{const c=e&&e.code||'';toast(({'auth/invalid-credential':'E-mail ou senha incorretos.','auth/wrong-password':'E-mail ou senha incorretos.','auth/user-not-found':'E-mail ou senha incorretos.','auth/invalid-login-credentials':'E-mail ou senha incorretos.','auth/email-already-in-use':'Já existe conta com este e-mail.','auth/weak-password':'Senha com no mínimo 6 caracteres.','auth/invalid-email':'E-mail inválido.','auth/too-many-requests':'Muitas tentativas. Espere um pouco e tente de novo.','auth/network-request-failed':'Sem internet. Tente de novo.','permission-denied':'Sem permissão para isso.','unavailable':'Sem internet. Tente de novo.'})[c]||('Não deu certo: '+(e&&e.message||e)),1)};
 function closeTeam(){unsub.forEach(f=>f());unsub=[];T=null;SH=null;LOADING=false}
-function applyCore(d){const ms=Object.values(d.membros||{}).sort((a,b)=>(a.desde||0)-(b.desde||0));[T,SH].forEach(o=>{CORE.forEach(k=>o[k]=d[k]);o.cod=d.cod;o.criado=d.criado;o.membros=clone(ms)})}
+function applyCore(d){const ms=Object.values(d.membros||{}).sort((a,b)=>(a.desde||0)-(b.desde||0));[T,SH].forEach(o=>{CORE.forEach(k=>o[k]=d[k]);o.pausado=!!d.pausado;o.cod=d.cod;o.criado=d.criado;o.membros=clone(ms)})}
 function openTeam(tid){closeTeam();T={id:tid,membros:[]};SH={id:tid,membros:[]};COLS.forEach(c=>{T[c]=[];SH[c]=[]});LOADING=true;let pend=1+COLS.length;const got={};
   const ok=k=>{if(!got[k]){got[k]=1;if(--pend===0){LOADING=false;render();return}}if(!LOADING)soft()};
   const fail=e=>{erro(e);closeTeam();render()};const ref=fs.collection('teams').doc(tid);
@@ -189,23 +192,25 @@ function apurar(c,forcar){const el=eleitores(c).length,sim=Object.values(c.votos
 
 /* ---------- telas ---------- */
 function vAuth(){const m=UI.auth;let f;
-  if(m==='login')f=`<form data-f="login"><label>E-mail</label><input name="email" type="email" required autocomplete="username"><label>Senha</label><input name="senha" type="password" required autocomplete="current-password"><button class="btn g big">ENTRAR</button></form>
+  if(m==='login')f=`<form data-f="login"><label>E-mail</label><input name="email" type="email" required autocomplete="username"><label>Senha</label><div class="pw"><input name="senha" type="password" required autocomplete="current-password"><button type="button" class="eye" data-a="olho" aria-label="Mostrar ou esconder a senha">👁 ver</button></div><button class="btn g big">ENTRAR</button></form>
     <button class="lnk" data-a="auth" data-m="cad">Criar minha conta</button><button class="lnk" data-a="auth" data-m="rec">Esqueci a senha</button>`;
-  else if(m==='cad')f=`<form data-f="cad"><label>Nome completo</label><input name="nome" required><label>Apelido (como te chamam no jogo)</label><input name="apelido" required maxlength="20"><label>E-mail</label><input name="email" type="email" required autocomplete="username"><label>Senha (mínimo 6)</label><input name="senha" type="password" required minlength="6" autocomplete="new-password"><button class="btn g big">CRIAR CONTA</button></form><button class="lnk" data-a="auth" data-m="login">Já tenho conta</button>`;
+  else if(m==='cad')f=`<form data-f="cad"><label>Nome completo</label><input name="nome" required><label>Apelido (como te chamam no jogo)</label><input name="apelido" required maxlength="20"><label>E-mail</label><input name="email" type="email" required autocomplete="username"><label>Senha (mínimo 6)</label><div class="pw"><input name="senha" type="password" required minlength="6" autocomplete="new-password"><button type="button" class="eye" data-a="olho" aria-label="Mostrar ou esconder a senha">👁 ver</button></div><button class="btn g big">CRIAR CONTA</button></form><button class="lnk" data-a="auth" data-m="login">Já tenho conta</button>`;
   else f=`<form data-f="rec1"><p class="mt">Digite o e-mail da sua conta. Você recebe um link para criar uma senha nova.</p><label>E-mail da conta</label><input name="email" type="email" required><button class="btn b big">ENVIAR LINK</button></form><button class="lnk" data-a="auth" data-m="login">Voltar</button>`;
   return `<div class="auth">${crest(150)}<div class="ttl">RESENHA FC</div><p class="mt">Gestão do seu time de futsal e futebol</p>${f}</div>`}
 
-function vSemTime(){const outros=MY;
+const updBar=()=>UPD?`<div class="card hl"><b>Tem versão nova do app.</b><button class="btn g big" style="margin-top:8px" data-a="atualizar">ATUALIZAR AGORA</button></div>`:'';
+function vBloq(msg,trocar){return `<div class="auth" style="padding-top:60px">${crest(110)}<div class="card" style="border-color:var(--r);margin-top:16px"><b style="color:var(--r)">${esc(msg)}</b><p class="mt">Fale com o desenvolvedor do app.</p></div>${trocar?'<button class="btn big" style="margin-bottom:8px" data-a="trocarTime">Trocar de time</button>':''}<button class="lnk" data-a="sair">Sair da conta</button></div>`}
+function vSemTime(){const outros=MY;if(UI.sub==='sugestoes'||UI.sub==='dev'||UI.sub==='app')return `<button class="btn sm" data-a="sub" data-s="" style="margin:12px 0 10px">‹ Voltar</button>`+({sugestoes:vSug,dev:vDev,app:vApp})[UI.sub]();
   return `<div class="auth">${crest(90)}<div class="ttl" style="font-size:20px">Olá, ${esc(me().apelido)}</div>
   ${outros.length?`<div class="card" style="text-align:left"><h2>Meus times</h2>${outros.map(t=>`<button class="btn big" style="margin-bottom:8px" data-a="abrirTime" data-id="${t.id}">${esc(t.nome)}</button>`).join('')}</div>`:''}
   <div class="card" style="text-align:left"><h2>Criar um time</h2><form data-f="novoTime"><label>Nome do time</label><input name="nome" required maxlength="40"><label>Valor da mensalidade (R$)</label><input name="mens" inputmode="decimal" value="50"><button class="btn g big">CRIAR TIME</button></form></div>
   <div class="card" style="text-align:left"><h2>Entrar em um time</h2><form data-f="entrar"><label>Código de convite</label><input name="cod" required maxlength="6" style="text-transform:uppercase"><button class="btn b big">ENTRAR NO TIME</button></form></div>
-  <button class="lnk" data-a="sair">Sair da conta</button></div>`}
+  ${updBar()}<div class="btns fill" style="margin-bottom:8px"><button class="btn sm" data-a="sub" data-s="sugestoes">💡 Sugestões</button><button class="btn sm" data-a="sub" data-s="app">📲 Compartilhar</button>${ME.dev?'<button class="btn sm" data-a="sub" data-s="dev">🛠 Desenvolvedor</button>':''}</div><button class="lnk" data-a="sair">Sair da conta</button></div>`}
 
 function vShell(){const t=team();const tabs=[['inicio','🏠','Início'],['jogos','⚽','Jogos'],['caixa','💰','Caixa'],['chat','💬','Chat'],['mais','☰','Mais']];
   let body;if(UI.jogo&&t.jogos.find(j=>j.id===UI.jogo))body=vJogo(t.jogos.find(j=>j.id===UI.jogo));
   else body=({inicio:vInicio,jogos:vJogos,caixa:vCaixa,chat:vChat,mais:vMais})[UI.tab]();
-  return `<div class="top">${crest(38)}<div class="ttl">${esc(t.nome)}<small>${APP} · ${esc(me().apelido)} · ${meuPapel()}</small></div></div>${body}
+  return `<div class="top">${crest(38)}<div class="ttl">${esc(t.nome)}<small>${APP} · ${esc(me().apelido)} · ${meuPapel()}</small></div><button class="btn sm" data-a="modal" data-t="novid" aria-label="Novidades">🆕</button></div>${updBar()}${body}
   <nav class="nav"><div>${tabs.map(x=>`<button class="${UI.tab===x[0]?'on':''}" data-a="tab" data-t="${x[0]}"><b>${x[1]}</b>${x[2]}</button>`).join('')}</div></nav>`}
 
 function proxJogo(){return team().jogos.filter(j=>j.fase!=='fechado').sort((a,b)=>a.ts-b.ts)[0]}
@@ -274,9 +279,9 @@ function vChat(){return `<input id="busca" placeholder="🔎 Pesquisar no histó
   <div class="card" style="padding:8px"><div id="chatlist">${chatItens()}</div></div>
   <form data-f="chat" class="btns"><input name="t" id="chatin" placeholder="Mensagem" autocomplete="off" maxlength="500" style="flex:1;margin:0;width:auto"><button class="btn g">Enviar</button></form>`}
 
-function vMais(){const s=UI.sub;if(s)return `<button class="btn sm" data-a="sub" data-s="" style="margin-bottom:10px">‹ Voltar</button>`+({ranking:vRanking,cartoes:vCartoes,avisos:vAvisos,linha:vLinha,elenco:vElenco,config:vConfig,conta:vConta})[s]();
+function vMais(){const s=UI.sub;if(s)return `<button class="btn sm" data-a="sub" data-s="" style="margin-bottom:10px">‹ Voltar</button>`+({ranking:vRanking,cartoes:vCartoes,avisos:vAvisos,linha:vLinha,elenco:vElenco,config:vConfig,conta:vConta,sugestoes:vSug,app:vApp,dev:vDev})[s]();
   const it=[['ranking','🏆','Ranking e artilharia'],['cartoes','🟨','Cartões por votação'],['avisos','📢','Avisos gerais'],['linha','🕒','Linha do tempo'],['elenco','👥','Elenco']];
-  if(isAdm())it.push(['config','⚙️','Configurações do time']);it.push(['conta','👤','Minha conta']);
+  if(isAdm())it.push(['config','⚙️','Configurações do time']);it.push(['sugestoes','💡','Sugestões'],['app','📲','Compartilhar e instalar'],['conta','👤','Minha conta']);if(ME.dev)it.push(['dev','🛠','Desenvolvedor']);
   return `<div class="card">${it.map(x=>`<div class="row" data-a="sub" data-s="${x[0]}" style="cursor:pointer"><span style="font-size:22px">${x[1]}</span><div class="gr"><b>${x[2]}</b></div><span class="mt">›</span></div>`).join('')}<div class="row" data-a="modal" data-t="sorteio" style="cursor:pointer"><span style="font-size:22px">🎲</span><div class="gr"><b>Sorteador de times</b></div><span class="mt">›</span></div></div>`}
 
 function vRanking(){const ms=team().membros.map(m=>({m,s:stats(m.uid)}));const tb=(tit,key,f)=>{const a=ms.filter(x=>x.s[key]!=null&&x.s[key]>0).sort((a,b)=>b.s[key]-a.s[key]).slice(0,10);
@@ -304,14 +309,29 @@ function vElenco(){const t=team(),adm=isAdm();
   <div class="card"><h2>Elenco (${t.membros.length})</h2>${t.membros.map(m=>{const s=stats(m.uid);return `<div class="row" ${adm?`data-a="modal" data-t="membro" data-u="${m.uid}" style="cursor:pointer"`:''}><div class="gr"><b>${esc(m.nome)}</b> ${m.papel!=='jogador'?`<span class="tag b">${m.papel}</span>`:''} ${m.semConta?'<span class="tag">sem conta</span>':''} ${s.susp?'<span class="tag r">suspenso</span>':''}<br><small>${esc(m.pos||'posição livre')} · ⚽ ${s.gols} · ⭐ ${s.media==null?'–':s.media.toFixed(1)} · 🟨 ${s.amAt} · 🟥 ${s.ve}</small></div>${adm?'<span class="mt">›</span>':''}</div>`}).join('')}</div>
   ${adm?`<div class="card"><h2>Adicionar jogador sem conta</h2><p class="mt" style="margin-top:0">Para quem ainda não usa o app. Você confirma presença e dá baixa por ele.</p><form data-f="avulso" class="btns"><input name="nome" required maxlength="20" placeholder="Apelido do jogador" style="flex:1;margin:0;width:auto"><button class="btn g">Adicionar</button></form></div>`:''}`}
 
+function vSug(){return `<div class="card"><h2>Enviar sugestão</h2><form data-f="sug"><textarea name="t" rows="4" required maxlength="1000" placeholder="O que pode melhorar no app? Escreva aqui para o desenvolvedor."></textarea><button class="btn g">Enviar sugestão</button></form></div>
+  <div class="card"><h2>Minhas sugestões</h2>${SUG==null?'<p class="mt">Carregando…</p>':SUG.length?SUG.slice().sort((a,b)=>b.ts-a.ts).map(x=>`<div class="row"><div class="gr" style="white-space:pre-wrap">${esc(x.texto)}<br><small>${dt(x.ts)}</small></div><span class="tag ${x.status==='feita'?'g':x.status==='vista'?'b':'y'}">${esc(x.status)}</span></div>`).join(''):'<p class="mt">Você ainda não enviou sugestões.</p>'}</div>`}
+function vApp(){const u=location.origin+location.pathname;return `<div class="card"><h2>Compartilhar o app</h2><p style="word-break:break-all;color:var(--b);margin-top:0">${esc(u)}</p><button class="btn g" data-a="copiarLink">📋 Copiar link</button>${T?`<p class="mt" style="margin-bottom:0">Código de convite do time: <b style="color:var(--g)">${esc(T.cod)}</b></p>`:''}</div>
+  <div class="card"><h2>Instalar no celular</h2><p class="mt" style="margin:0">Android (Chrome): toque nos três pontinhos e em "Adicionar à tela inicial".<br>iPhone (Safari): toque em Compartilhar e em "Adicionar à Tela de Início".</p></div>
+  <div class="card"><h2>Versão ${VER}</h2><button class="btn sm" data-a="novid">🆕 Ver novidades</button></div>`}
+function vDev(){if(!ME.dev)return '';const D=DEV;if(!D)return '<div class="card"><p class="mt">Carregando…</p></div>';
+  return `<div class="card hl"><h2>Painel do desenvolvedor</h2><p class="mt" style="margin:0">${D.teams.length} times · ${D.users.length} usuários · ${D.sugs.filter(x=>x.status==='nova').length} sugestões novas</p><button class="btn sm" style="margin-top:8px" data-a="devReload">Atualizar lista</button></div>
+  <div class="card"><h2>Sugestões de todos</h2>${D.sugs.length?D.sugs.slice().sort((a,b)=>b.ts-a.ts).map(x=>`<div class="row" style="display:block"><span style="white-space:pre-wrap">${esc(x.texto)}</span><br><small class="mt">${esc(x.nome)} · ${esc(x.time||'sem time')} · ${esc(x.email)} · ${dt(x.ts)}</small><div class="btns" style="margin-top:6px"><span class="tag ${x.status==='feita'?'g':x.status==='vista'?'b':'y'}">${esc(x.status)}</span><button class="btn sm" data-a="devSug" data-i="${x.id}" data-st="vista">vista</button><button class="btn sm" data-a="devSug" data-i="${x.id}" data-st="feita">feita</button><button class="btn sm r" data-a="conf" data-k="devDelSug" data-i="${x.id}" data-msg="Excluir esta sugestão?">excluir</button></div></div>`).join(''):'<p class="mt">Nenhuma sugestão ainda.</p>'}</div>
+  <div class="card"><h2>Times cadastrados</h2>${D.teams.map(x=>`<div class="row"><div class="gr"><b>${esc(x.nome)}</b> ${x.pausado?'<span class="tag r">pausado</span>':''}<br><small>${Object.keys(x.membros||{}).length} jogadores · criado em ${x.criado?dt(x.criado):'–'}</small></div><button class="btn sm ${x.pausado?'g':'r'}" data-a="devPausa" data-c="teams" data-i="${x.id}">${x.pausado?'reativar':'pausar'}</button></div>`).join('')||'<p class="mt">Nenhum time.</p>'}</div>
+  <div class="card"><h2>Usuários</h2>${D.users.map(x=>`<div class="row"><div class="gr"><b>${esc(x.apelido||x.nome)}</b> ${x.pausado?'<span class="tag r">pausado</span>':''}<br><small>${esc(x.nome)} · ${esc(x.email)}</small></div>${x.id===ME.id?'<span class="tag b">você</span>':`<button class="btn sm ${x.pausado?'g':'r'}" data-a="devPausa" data-c="users" data-i="${x.id}">${x.pausado?'reativar':'pausar'}</button>`}</div>`).join('')}</div>`}
+const lista=q=>q.docs.map(x=>Object.assign({},x.data(),{id:x.id}));
+function loadSug(){SUG=null;fs.collection('sugestoes').where('uid','==',ME.id).get().then(q=>{SUG=lista(q);soft()},e=>{SUG=[];erro(e);soft()})}
+function loadDev(){if(!ME.dev)return;DEV=null;Promise.all([fs.collection('teams').get(),fs.collection('users').get(),fs.collection('sugestoes').get()]).then(r=>{DEV={teams:lista(r[0]),users:lista(r[1]),sugs:lista(r[2])};soft()},e=>{DEV={teams:[],users:[],sugs:[]};erro(e);soft()})}
+function checkVer(){if(typeof fetch!=='function'||UPD)return;fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/const VER=(\d+)/);if(m&&+m[1]>VER){UPD=true;soft()}}).catch(()=>{})}
 function vConfig(){const t=team();return `<div class="card"><h2>Configurações do time</h2><form data-f="config"><label>Nome do time</label><input name="nome" required value="${esc(t.nome)}"><div class="grid2"><div><label>Mensalidade (R$)</label><input name="mens" inputmode="decimal" value="${String(t.mens).replace('.',',')}"></div><div><label>Dia do vencimento</label><input name="venc" type="number" min="1" max="31" value="${t.venc}"></div></div><label>Titulares por jogo (padrão)</label><input name="vagas" type="number" min="1" max="30" value="${t.vagas}"><label>Regras dos cartões</label><textarea name="regras" rows="6">${esc(t.regras)}</textarea><button class="btn g big">SALVAR</button></form></div>`}
 function vConta(){const u=me();return `<div class="card"><h2>Minha conta</h2><p style="margin:0 0 10px"><b>${esc(u.nome)}</b><br><span class="mt">${esc(u.email)}</span></p><form data-f="perfil"><label>Apelido no time</label><input name="apelido" required maxlength="20" value="${esc(mem_(u.id).nome)}"><label>Posição</label><select name="pos">${['','Goleiro','Fixo','Ala','Pivô','Zagueiro','Lateral','Meia','Atacante'].map(p=>`<option ${mem_(u.id).pos===p?'selected':''}>${p}</option>`).join('')}</select><button class="btn g">Salvar</button></form></div>
-  <div class="card"><h2>Trocar senha</h2><form data-f="senha"><label>Senha atual</label><input name="a" type="password" required><label>Nova senha (mínimo 6)</label><input name="n" type="password" required minlength="6"><button class="btn b">Trocar senha</button></form></div>
+  <div class="card"><h2>Trocar senha</h2><form data-f="senha"><label>Senha atual</label><div class="pw"><input name="a" type="password" required><button type="button" class="eye" data-a="olho" aria-label="Mostrar ou esconder a senha">👁 ver</button></div><label>Nova senha (mínimo 6)</label><div class="pw"><input name="n" type="password" required minlength="6"><button type="button" class="eye" data-a="olho" aria-label="Mostrar ou esconder a senha">👁 ver</button></div><button class="btn b">Trocar senha</button></form></div>
   <div class="btns"><button class="btn" data-a="trocarTime">Trocar de time / criar outro</button><button class="btn r" data-a="sair">Sair da conta</button></div>`}
 
 /* ---------- janelas ---------- */
 function vModal(){const m=UI.modal,t=team();let h='';const x=`<button class="btn" type="button" data-a="fechar">Cancelar</button>`;
-  if(m.t==='conf')h=`<p style="font-size:16px">${esc(m.msg)}</p><div class="btns fill">${x}<button class="btn g" data-a="confOk">Confirmar</button></div>`;
+  if(m.t==='novid')h=`<h2>Novidades do app</h2>${NOVID.map(n=>`<h3>Versão ${n[0]} · ${n[1]}</h3><ul style="margin:0;padding-left:18px">${n[2].map(i=>`<li>${esc(i)}</li>`).join('')}</ul>`).join('')}<button class="btn big" style="margin-top:14px" data-a="fechar">Fechar</button>`;
+  else if(m.t==='conf')h=`<p style="font-size:16px">${esc(m.msg)}</p><div class="btns fill">${x}<button class="btn g" data-a="confOk">Confirmar</button></div>`;
   else if(m.t==='jogo'){const j=m.j&&t.jogos.find(q=>q.id===m.j),d=j?new Date(j.ts):null,pz=j?new Date(j.prazo):null,iso=q=>q.getFullYear()+'-'+p2(q.getMonth()+1)+'-'+p2(q.getDate()),hr=q=>p2(q.getHours())+':'+p2(q.getMinutes());
     h=`<h2>${j?'Editar jogo':'Marcar jogo'}</h2><form data-f="jogo"><div class="grid2"><div><label>Data</label><input name="d" type="date" required value="${d?iso(d):''}"></div><div><label>Horário</label><input name="h" type="time" required value="${d?hr(d):'20:00'}"></div></div><label>Local</label><input name="local" required maxlength="60" value="${j?esc(j.local):''}"><label>Adversário (deixe vazio se for jogo entre nós)</label><input name="adv" maxlength="40" value="${j?esc(j.adv):''}"><label>Titulares</label><input name="vagas" type="number" min="1" max="30" value="${j?j.vagas:t.vagas}"><div class="grid2"><div><label>Prazo final para confirmar</label><input name="pd" type="date" value="${pz?iso(pz):''}"></div><div><label>Hora do prazo</label><input name="ph" type="time" value="${pz?hr(pz):'18:00'}"></div></div><p class="mt" style="margin-top:0">Sem prazo preenchido, vale até 2 horas antes do jogo.</p><div class="btns fill">${x}<button class="btn g">Salvar jogo</button></div></form>`}
   else if(m.t==='presAdm'){h=`<h2>Presença de ${esc(nome(m.u))}</h2><div class="btns fill" style="flex-direction:column">${[['vou','✅ Vai / foi'],['nao','❌ Não vai'],['faltou','🚫 Faltou sem avisar'],['','❔ Sem resposta']].map(o=>`<button class="btn" data-a="presSet" data-r="${o[0]}">${o[1]}</button>`).join('')}${x}</div>`}
@@ -325,8 +345,8 @@ function vModal(){const m=UI.modal,t=team();let h='';const x=`<button class="btn
   return `<div class="modal" data-a="fundo"><div>${h}</div></div>`}
 
 function render(keep){const a=$('#app');let h;
-  if(BOOT||LOADING)h=`<div class="auth" style="padding-top:80px">${crest(120)}<p class="mt">Carregando…</p></div>`;else if(!me())h=vAuth();else if(!team())h=vSemTime();else h=vShell();
-  let md='';if(UI.modal&&team()&&!LOADING&&!BOOT){try{md=vModal()}catch(e){UI.modal=null}}
+  if(BOOT||LOADING)h=`<div class="auth" style="padding-top:80px">${crest(120)}<p class="mt">Carregando…</p></div>`;else if(!me())h=updBar()+vAuth();else if(ME.pausado)h=vBloq('Sua conta foi pausada pelo desenvolvedor.');else if(!team())h=vSemTime();else if(T.pausado&&!ME.dev)h=vBloq('Este time foi pausado pelo desenvolvedor.',1);else h=vShell();
+  let md='';if(UI.modal&&(team()||UI.modal.t==='novid'||UI.modal.t==='conf')&&!LOADING&&!BOOT){try{md=vModal()}catch(e){UI.modal=null}}
   a.innerHTML=h+md;const c=$('#chatlist');if(c)c.scrollTop=c.scrollHeight;if(keep){const e=$(keep);if(e)e.focus()}}
 /* atualização vinda de outro aparelho: redesenha sem apagar o que a pessoa está digitando */
 function soft(){const ks=()=>{const cnt={},r=[];document.querySelectorAll('#app input,#app textarea,#app select').forEach(e=>{if(e.type==='file'||e.dataset.ch)return;const f=e.closest('form[data-f]'),b=(f?f.dataset.f:'')+'|'+(e.name||e.id||e.dataset.in||'');cnt[b]=(cnt[b]||0)+1;r.push([b+'|'+cnt[b],e])});return r};
@@ -348,8 +368,15 @@ function darBaixa(uid,mes,comp){const t=team();if(pagou(uid,mes))return toast('E
 
 const A={
  auth(d){UI.auth=d.m;UI.rec=null;render()},
+ olho(d,el){const i=el.parentNode.querySelector('input'),v=i.type==='password';i.type=v?'text':'password';el.textContent=v?'🙈 esconder':'👁 ver';i.focus()},
  tab(d){UI.tab=d.t;UI.jogo=null;UI.sub=null;UI.busca='';render()},
- sub(d){UI.tab='mais';UI.jogo=null;UI.sub=d.s||null;UI.busca='';render()},
+ sub(d){UI.tab='mais';UI.jogo=null;UI.sub=d.s||null;UI.busca='';render();if(d.s==='sugestoes')loadSug();if(d.s==='dev')loadDev()},
+ novid(){UI.modal={t:'novid'};render()},
+ atualizar(){location.reload()},
+ copiarLink(){try{navigator.clipboard.writeText(location.origin+location.pathname).then(()=>toast('Link copiado.'),()=>toast('Não deu para copiar neste aparelho.',1))}catch(e){toast('Não deu para copiar neste aparelho.',1)}},
+ devReload(){loadDev();render()},
+ devSug(d){fs.collection('sugestoes').doc(d.i).update({status:d.st}).then(()=>{const x=DEV&&DEV.sugs.find(q=>q.id===d.i);if(x)x.status=d.st;render()},erro)},
+ devPausa(d){const x=DEV&&DEV[d.c].find(q=>q.id===d.i);if(!x)return;const v=!x.pausado;fs.collection(d.c).doc(d.i).update({pausado:v}).then(()=>{x.pausado=v;render();toast(v?'Pausado.':'Reativado.')},erro)},
  jogo(d){UI.jogo=d.id;UI.tab='jogos';render();window.scrollTo(0,0)},
  voltar(){UI.jogo=null;render()},
  modal(d){const mm=UI.modal={t:d.t,j:d.j,u:d.u,p:d.p,tp:d.tp};render();if(d.t==='comp')tref().collection('comps').doc(d.p).get().then(s=>{if(UI.modal!==mm)return;if(s.exists)mm.img=s.data().img;else mm.err='Comprovante não encontrado.';render()},()=>{if(UI.modal!==mm)return;mm.err='Não consegui carregar. Confira a internet.';render()})},
@@ -378,12 +405,14 @@ const A={
  resortear(){const m=UI.modal;m.res=sortear(m.uids,m.n,m.eq);if(m.j)team().jogos.find(q=>q.id===m.j).times=m.res;save();render()}
 };
 const C={
+ devDelSug(d){fs.collection('sugestoes').doc(d.i).delete().then(()=>{if(DEV)DEV.sugs=DEV.sugs.filter(q=>q.id!==d.i);render()},erro)},
  delJogo(d){const t=team(),j=t.jogos.find(q=>q.id===d.j);t.jogos=t.jogos.filter(q=>q.id!==d.j);UI.jogo=null;log(`Jogo de ${dd(j.ts)} foi apagado por ${nome(me().id)}`,'🗑')},
  estornar(d){const t=team(),p=t.pagamentos.find(q=>q.id===d.p);p.status='estornado';const c=t.caixa.find(q=>q.pag===p.id);if(c)c.estornado=true;log(`Mensalidade de ${nome(p.uid)} (${mesNome(p.mes)}) estornada por ${nome(me().id)}`,'↩')},
  delAviso(d){const t=team();t.avisos=t.avisos.filter(q=>q.id!==d.i)},
  delMembro(d){const t=team(),n=nome(d.u);t.membros=t.membros.filter(q=>q.uid!==d.u);t.timeline.push({id:nid(),texto:n+' saiu do time',ic:'👋',ts:Date.now()})}
 };
 const F={
+ async sug(v){const x={uid:ME.id,nome:ME.apelido||ME.nome||'',email:ME.email||'',time:T?T.nome:'',texto:v.t.trim(),ts:Date.now(),status:'nova'},r=fs.collection('sugestoes').doc();await r.set(x);(SUG=SUG||[]).push(Object.assign({id:r.id},x));render();toast('Sugestão enviada. Obrigado!')},
  async login(v){await auth.signInWithEmailAndPassword(v.email.trim(),v.senha)},
  async cad(v){if(v.senha.length<6)return toast('Senha com no mínimo 6 caracteres.',1);PEND={nome:v.nome.trim(),apelido:v.apelido.trim()};await auth.createUserWithEmailAndPassword(v.email.trim(),v.senha);toast('Conta criada!')},
  async rec1(v){await auth.sendPasswordResetEmail(v.email.trim());UI.auth='login';render();toast('Enviamos o link para o seu e-mail. Veja também a caixa de spam.')},
@@ -423,10 +452,11 @@ document.addEventListener('change',e=>{const el=e.target;
   if(el.dataset.ch==='jogada'){const j=team().jogos.find(q=>q.id===el.dataset.j);if(el.value)j.jogada[me().id]=el.value;else delete j.jogada[me().id];save();render()}});
 document.addEventListener('input',e=>{if(e.target.dataset.in==='busca'){UI.busca=e.target.value;const c=$('#chatlist'),l=$('#linha');if(c)c.innerHTML=chatItens();if(l)l.innerHTML=linhaItens()}});
 render();
+checkVer();setInterval(checkVer,6e5);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkVer()});
 auth.onAuthStateChanged(async u=>{closeTeam();if(!u){ME=null;MY=[];BOOT=false;render();return}BOOT=true;render();
   try{const ur=fs.collection('users').doc(u.uid),s=await ur.get();let d=s.exists?s.data():null;
     if(!d){d=Object.assign({nome:u.email,apelido:u.email.split('@')[0]},PEND||{},{email:u.email,criado:Date.now()});await ur.set(d)}PEND=null;
-    ME=Object.assign({},d,{id:u.uid});const q=await fs.collection('teams').where('uids','array-contains',u.uid).get();MY=q.docs.map(x=>({id:x.id,nome:x.data().nome}));BOOT=false;
+    ME=Object.assign({},d,{id:u.uid});try{ME.dev=(await fs.collection('devs').doc(u.uid).get()).exists}catch(e){ME.dev=false}const q=await fs.collection('teams').where('uids','array-contains',u.uid).get();MY=q.docs.map(x=>({id:x.id,nome:x.data().nome}));BOOT=false;
     const alvo=ME.ultimo&&MY.some(t=>t.id===ME.ultimo)?ME.ultimo:(MY.length===1?MY[0].id:null);if(alvo)openTeam(alvo);else render()}
   catch(e){BOOT=false;erro(e);render()}});
 </script>
