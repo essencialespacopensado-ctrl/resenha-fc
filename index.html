@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resenha FC</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#00123a;--pn:#001c57;--pn2:#002776;--bd:#2148a0;--g:#ffdf00;--b:#2fd675;--tx:#ffffff;--mt:#a9bce6;--y:#ff9f1c;--r:#ff5a6a}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+#app{max-width:760px;margin:0 auto;min-height:100vh;padding:0 12px 86px}
+h1,h2,h3,.ttl{font-family:Orbitron,system-ui,sans-serif;letter-spacing:.04em;margin:0}
+h2{font-size:15px;color:var(--b);text-transform:uppercase;margin:0 0 10px}
+h3{font-size:13px;color:var(--g);text-transform:uppercase;margin:14px 0 6px}
+.top{display:flex;align-items:center;gap:10px;padding:10px 0;position:sticky;top:0;background:var(--bg);z-index:5;border-bottom:1px solid var(--bd);margin-bottom:12px}
+.top .ttl{font-size:17px;color:var(--g);flex:1;line-height:1.1}
+.top small{display:block;color:var(--mt);font:12px system-ui;letter-spacing:0}
+.card{background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px}
+.card.hl{border-color:var(--g)}
+.row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd)}
+.row:last-child{border-bottom:0}
+.row .gr{flex:1;min-width:0}
+.row .gr small,.mt{color:var(--mt);font-size:12.5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--pn2);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;font:600 14px system-ui;cursor:pointer;min-height:42px;text-align:center}
+.btn:hover{border-color:var(--b)}
+.btn.g{background:var(--g);color:#002776;border-color:var(--g)}
+.btn.b{background:#009c3b;color:#fff;border-color:#009c3b}
+.btn.r{color:var(--r);border-color:var(--r);background:transparent}
+.btn.sm{min-height:32px;padding:5px 10px;font-size:13px}
+.btn.big{width:100%;min-height:52px;font-size:16px}
+.btn.on{border-color:var(--g);color:var(--g)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns.fill>*{flex:1}
+input,select,textarea{width:100%;background:#000c2b;color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:11px 12px;font:15px system-ui;margin:4px 0 10px}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--b)}
+label{font-size:12.5px;color:var(--mt)}
+label.ck{display:flex;align-items:center;gap:8px;color:var(--tx);font-size:14px;padding:6px 0}
+label.ck input{width:20px;height:20px;margin:0}
+.tag{display:inline-block;border:1px solid var(--bd);border-radius:20px;padding:2px 9px;font-size:12px;color:var(--mt);white-space:nowrap}
+.tag.g{color:var(--g);border-color:var(--g)} .tag.b{color:var(--b);border-color:var(--b)}
+.tag.y{color:var(--y);border-color:var(--y)} .tag.r{color:var(--r);border-color:var(--r)}
+.num{font-family:Orbitron,sans-serif;font-size:26px;color:var(--g)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nav{position:fixed;left:0;right:0;bottom:0;background:#000c2b;border-top:1px solid var(--bd);display:flex;justify-content:center;z-index:6}
+.nav div{display:flex;max-width:760px;width:100%}
+.nav button{flex:1;background:none;border:0;color:var(--mt);padding:9px 2px 11px;font:600 11.5px system-ui;cursor:pointer;border-top:2px solid transparent}
+.nav button b{display:block;font-size:20px;font-weight:400}
+.nav button.on{color:var(--g);border-top-color:var(--g)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--pn2);border:1px solid var(--bd);border-radius:20px;padding:5px 11px;font-size:13.5px;cursor:default}
+.chip[data-a]{cursor:pointer}
+.auth{max-width:400px;margin:0 auto;padding-top:26px;text-align:center}
+.auth form{text-align:left}
+.auth .ttl{font-size:28px;color:var(--g);margin:6px 0 2px}
+.lnk{background:none;border:0;color:var(--b);cursor:pointer;font:14px system-ui;padding:8px;text-decoration:underline}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.modal>div{background:var(--pn);border:1px solid var(--b);border-radius:16px 16px 0 0;padding:16px;width:100%;max-width:560px;max-height:90vh;overflow:auto}
+@media(min-width:600px){.modal{align-items:center}.modal>div{border-radius:16px}}
+#toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--g);color:#002776;font-weight:700;padding:10px 16px;border-radius:10px;z-index:30;display:none;max-width:90vw;text-align:center}
+#toast.err{background:var(--r);color:#fff}
+.msg{padding:8px 10px;border-radius:10px;background:var(--pn2);margin:6px 0;max-width:86%}
+.msg.me{margin-left:auto;border:1px solid var(--g)}
+.msg small{color:var(--mt);font-size:11.5px;display:block}
+#chatlist{height:calc(100vh - 290px);min-height:220px;overflow:auto;padding:4px}
+.tl{border-left:2px solid var(--b);margin-left:6px;padding-left:12px}
+.tl div{padding:6px 0;position:relative}
+.tl div:before{content:"";position:absolute;left:-18px;top:13px;width:8px;height:8px;border-radius:50%;background:var(--g)}
+.cnt{display:flex;align-items:center;gap:8px}
+.cnt b{font-family:Orbitron,sans-serif;font-size:20px;min-width:28px;text-align:center;color:var(--g)}
+img.comp{max-width:100%;border-radius:10px;border:1px solid var(--bd)}
+.warn{color:var(--y);font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:7px 4px;border-bottom:1px solid var(--bd);text-align:left}
+th{color:var(--mt);font-weight:600;font-size:12px}
+td.n,th.n{text-align:right}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="toast"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+"use strict";
+const APP='Resenha FC', KEY='resenhafc_v1';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+const hash=str=>{let a=0xdeadbeef,b=0x41c6ce57;for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);a=Math.imul(a^c,2654435761);b=Math.imul(b^c,1597334677)}a=Math.imul(a^(a>>>16),2246822507)^Math.imul(b^(b>>>13),3266489909);b=Math.imul(b^(b>>>16),2246822507)^Math.imul(a^(a>>>13),3266489909);return(4294967296*(2097151&b)+(a>>>0)).toString(36)};
+const money=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const num=s=>{const n=parseFloat(String(s).replace(/\./g,'').replace(',','.'));return isNaN(n)?parseFloat(s)||0:n};
+const dt=ts=>new Date(ts).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const dd=ts=>new Date(ts).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'});
+const hh=ts=>new Date(ts).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+const p2=n=>String(n).padStart(2,'0');
+const mk=ts=>{const d=new Date(ts);return d.getFullYear()+'-'+p2(d.getMonth()+1)};
+const MES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const mesNome=k=>MES[+k.slice(5)-1]+' de '+k.slice(0,4);
+const mesAdd=(k,n)=>{const d=new Date(+k.slice(0,4),+k.slice(5)-1+n,1);return d.getFullYear()+'-'+p2(d.getMonth()+1)};
+const PERG=['Nome do seu primeiro time?','Nome da sua mãe?','Cidade onde nasceu?','Apelido de infância?'];
+const CORES=[['Amarelo','#ffdf00'],['Verde','#2fd675'],['Azul','#7fb2ff'],['Branco','#ffffff']];
+
+/* ---------- nuvem (Firebase): cada time isolado, gravação campo a campo, tempo real ---------- */
+firebase.initializeApp({apiKey:"AIzaSyBEz4IV_JeKn142dg0x2ZkP9-dQh38pZts",authDomain:"resenha-fc-4ed8f.firebaseapp.com",projectId:"resenha-fc-4ed8f",storageBucket:"resenha-fc-4ed8f.firebasestorage.app",messagingSenderId:"1064006149833",appId:"1:1064006149833:web:1606c3b1c024cd228e4f18"});
+const auth=firebase.auth(),fs=firebase.firestore(),FV=firebase.firestore.FieldValue;
+const COLS=['pagamentos','caixa','jogos','avisos','chat','timeline','cartoes'],CORE=['nome','mens','venc','vagas','regras'];
+let ME=null,T=null,SH=null,MY=[],unsub=[],BOOT=true,LOADING=false,PEND=null,BUSY=false;
+let UI={tab:'inicio',sub:null,jogo:null,auth:'login',modal:null,mes:mk(Date.now()),busca:''};
+const J=x=>JSON.stringify(x),clone=x=>JSON.parse(JSON.stringify(x)),isObj=x=>x&&typeof x==='object'&&!Array.isArray(x);
+const tref=()=>fs.collection('teams').doc(T.id);
+const erro=e=>{const c=e&&e.code||'';toast(({'auth/invalid-credential':'E-mail ou senha incorretos.','auth/wrong-password':'E-mail ou senha incorretos.','auth/user-not-found':'E-mail ou senha incorretos.','auth/invalid-login-credentials':'E-mail ou senha incorretos.','auth/email-already-in-use':'Já existe conta com este e-mail.','auth/weak-password':'Senha com no mínimo 6 caracteres.','auth/invalid-email':'E-mail inválido.','auth/too-many-requests':'Muitas tentativas. Espere um pouco e tente de novo.','auth/network-request-failed':'Sem internet. Tente de novo.','permission-denied':'Sem permissão para isso.','unavailable':'Sem internet. Tente de novo.'})[c]||('Não deu certo: '+(e&&e.message||e)),1)};
+function closeTeam(){unsub.forEach(f=>f());unsub=[];T=null;SH=null;LOADING=false}
+function applyCore(d){const ms=Object.values(d.membros||{}).sort((a,b)=>(a.desde||0)-(b.desde||0));[T,SH].forEach(o=>{CORE.forEach(k=>o[k]=d[k]);o.cod=d.cod;o.criado=d.criado;o.membros=clone(ms)})}
+function openTeam(tid){closeTeam();T={id:tid,membros:[]};SH={id:tid,membros:[]};COLS.forEach(c=>{T[c]=[];SH[c]=[]});LOADING=true;let pend=1+COLS.length;const got={};
+  const ok=k=>{if(!got[k]){got[k]=1;if(--pend===0){LOADING=false;render();return}}if(!LOADING)soft()};
+  const fail=e=>{erro(e);closeTeam();render()};const ref=fs.collection('teams').doc(tid);
+  unsub.push(ref.onSnapshot(s=>{if(!T||T.id!==tid)return;const d=s.exists&&s.data();if(!d||!(d.uids||[]).includes(ME.id)){closeTeam();MY=MY.filter(x=>x.id!==tid);toast('Você não está mais neste time.',1);render();return}applyCore(d);ok('core')},fail));
+  COLS.forEach(c=>{let q=ref.collection(c);if(c==='chat'||c==='timeline')q=q.orderBy('ts','desc').limit(400);
+    unsub.push(q.onSnapshot(s=>{if(!T||T.id!==tid)return;const a=s.docs.map(x=>Object.assign({},x.data(),{id:x.id})).sort((x,y)=>(x.ts||0)-(y.ts||0));T[c]=a;SH[c]=clone(a);ok(c)},fail))});
+  if(ME.ultimo!==tid){ME.ultimo=tid;fs.collection('users').doc(ME.id).update({ultimo:tid}).catch(()=>{})}
+  render()}
+function diffItem(a,b){const up={};let ch=false;new Set(Object.keys(a).concat(Object.keys(b))).forEach(k=>{const va=a[k],vb=b[k];if(J(va)===J(vb))return;ch=true;
+  if(isObj(va)&&isObj(vb))new Set(Object.keys(va).concat(Object.keys(vb))).forEach(kk=>{if(J(va[kk])!==J(vb[kk]))up[k+'.'+kk]=kk in vb?vb[kk]:FV.delete()});
+  else up[k]=vb===undefined?FV.delete():vb});return ch?up:null}
+/* grava só o que mudou: nunca regrava o time inteiro, então um aparelho não apaga o que o outro salvou */
+function save(){if(!T||LOADING)return true;const b=fs.batch(),ref=tref(),cur=clone(T);let n=0;
+  const core={};CORE.forEach(k=>{if(J(cur[k])!==J(SH[k]))core[k]=cur[k]});
+  const mo={},mn={},rem=[];SH.membros.forEach(m=>mo[m.uid]=m);cur.membros.forEach(m=>mn[m.uid]=m);
+  for(const u in mn)if(J(mn[u])!==J(mo[u]))core['membros.'+u]=mn[u];
+  for(const u in mo)if(!mn[u]){core['membros.'+u]=FV.delete();if(!mo[u].semConta)rem.push(u)}
+  if(rem.length)core.uids=FV.arrayRemove.apply(FV,rem);
+  if(Object.keys(core).length){b.update(ref,core);n++}
+  COLS.forEach(c=>{const o={},w={};SH[c].forEach(x=>o[x.id]=x);cur[c].forEach(x=>w[x.id]=x);
+    for(const i in w){if(!o[i]){b.set(ref.collection(c).doc(i),w[i]);n++}else{const up=diffItem(o[i],w[i]);if(up){b.update(ref.collection(c).doc(i),up);n++}}}
+    for(const i in o)if(!w[i]){b.delete(ref.collection(c).doc(i));n++}});
+  if(!n)return true;SH=cur;b.commit().catch(()=>toast('Não consegui salvar na nuvem. Confira a internet.',1));return true}
+
+const me=()=>ME;
+const team=()=>T;
+const mem_=uid=>team().membros.find(m=>m.uid===uid);
+const nome=uid=>{const m=team()&&mem_(uid);return m?m.nome:'(saiu do time)'};
+const meuPapel=()=>{const m=mem_(me().id);return m?m.papel:'jogador'};
+const isAdm=()=>meuPapel()==='admin';
+const isTes=()=>isAdm()||meuPapel()==='tesoureiro';
+function log(texto,ic){team().timeline.push({id:nid(),texto,ic:ic||'•',ts:Date.now()})}
+function toast(t,err){const e=$('#toast');e.textContent=t;e.className=err?'err':'';e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',2600)}
+
+/* ---------- brasão ---------- */
+function crest(s){return `<svg width="${s}" height="${s*1.15}" viewBox="0 0 200 230" role="img" aria-label="Brasão Resenha FC">
+<path d="M100 6 L186 34 V112 C186 168 148 204 100 224 C52 204 14 168 14 112 V34 Z" fill="#002776" stroke="#ffdf00" stroke-width="7" stroke-linejoin="round"/>
+<path d="M100 20 L174 44 V112 C174 160 141 191 100 209 C59 191 26 160 26 112 V44 Z" fill="#009c3b" stroke="#ffffff" stroke-width="2.5"/>
+<path d="M26 112 C26 160 59 191 100 209 V44 L26 44 Z" fill="#ffffff" opacity=".10"/>
+<g fill="#ffdf00"><path d="M70 40l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"/><path d="M100 30l3.4 8h8l-6.6 4.6 2.4 8-7.2-4.8-7.2 4.8 2.4-8L88.6 38h8z"/><path d="M130 40l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"/></g>
+<circle cx="100" cy="100" r="33" fill="#002776" stroke="#ffffff" stroke-width="3.5"/>
+<path d="M100 84l15 11-6 18H91l-6-18z" fill="#ffdf00"/>
+<g stroke="#ffffff" stroke-width="3" stroke-linecap="round"><path d="M100 84V68M115 95l15-6M109 113l10 13M91 113l-10 13M85 95l-15-6"/></g>
+<path d="M6 136 H194 L182 151 L194 166 H6 L18 151 Z" fill="#ffdf00"/>
+<text x="100" y="158" text-anchor="middle" font-family="Orbitron,Arial Black,sans-serif" font-weight="800" font-size="20" fill="#002776" letter-spacing="1.5">RESENHA</text>
+<text x="100" y="190" text-anchor="middle" font-family="Orbitron,Arial Black,sans-serif" font-weight="800" font-size="20" fill="#ffffff" letter-spacing="4">FC</text>
+</svg>`}
+
+/* ---------- cálculos ---------- */
+const part=j=>team().membros.filter(m=>j.pres[m.uid]&&j.pres[m.uid].r==='vou');
+function listas(j){const ms=team().membros,vou=ms.filter(m=>j.pres[m.uid]&&j.pres[m.uid].r==='vou').sort((a,b)=>j.pres[a.uid].t-j.pres[b.uid].t);
+  return{tit:vou.slice(0,j.vagas),res:vou.slice(j.vagas),nao:ms.filter(m=>j.pres[m.uid]&&j.pres[m.uid].r==='nao'),falt:ms.filter(m=>j.pres[m.uid]&&j.pres[m.uid].r==='faltou'),sem:ms.filter(m=>!j.pres[m.uid])}}
+function notaJogo(j,uid){let s=0,n=0;for(const v in j.notas){const x=j.notas[v][uid];if(x!=null){s+=x;n++}}return n?s/n:null}
+function stats(uid){const t=team();let gols=0,jg=0,s=0,n=0,jb=0;
+  t.jogos.forEach(j=>{gols+=j.gols[uid]||0;if(j.pres[uid]&&j.pres[uid].r==='vou'&&j.fase!=='agendado')jg++;
+    for(const v in j.notas){const x=j.notas[v][uid];if(x!=null){s+=x;n++}}
+    if(j.fase==='fechado'&&vencJogada(j)===uid)jb++});
+  const am=t.cartoes.filter(c=>c.alvo===uid&&c.tipo==='amarelo'&&c.status==='aplicado').length,
+        ve=t.cartoes.filter(c=>c.alvo===uid&&c.tipo==='vermelho'&&c.status==='aplicado').length,
+        amAt=t.cartoes.filter(c=>c.alvo===uid&&c.tipo==='amarelo'&&c.status==='aplicado'&&!c.usado).length,
+        susp=t.cartoes.some(c=>c.alvo===uid&&c.tipo==='vermelho'&&c.status==='aplicado'&&!c.cumprido);
+  return{gols,jg,media:n?s/n:null,jb,am,ve,amAt,susp}}
+function vencJogada(j){const c={};for(const v in j.jogada)c[j.jogada[v]]=(c[j.jogada[v]]||0)+1;let b=null,m=0;for(const u in c)if(c[u]>m){m=c[u];b=u}return b}
+const saldo=()=>team().caixa.filter(c=>!c.estornado).reduce((s,c)=>s+(c.tipo==='entrada'?c.valor:-c.valor),0);
+const pagou=(uid,mes)=>team().pagamentos.find(p=>p.uid===uid&&p.mes===mes&&p.status==='pago');
+const eleitores=c=>team().membros.filter(m=>!m.semConta&&m.uid!==c.alvo);
+function apurar(c,forcar){const el=eleitores(c).length,sim=Object.values(c.votos).filter(v=>v==='sim').length,nao=Object.values(c.votos).filter(v=>v==='nao').length;
+  let r=null;if(sim>el/2)r='aplicado';else if(nao>=el/2)r='rejeitado';else if(forcar)r=sim>nao?'aplicado':'rejeitado';
+  if(!r)return;c.status=r;c.fim=Date.now();
+  const ic=c.tipo==='amarelo'?'🟨':'🟥';
+  log(`Cartão ${c.tipo} para ${nome(c.alvo)}: ${r==='aplicado'?'APLICADO':'rejeitado'} (${sim} sim × ${nao} não)`,ic);
+  if(r==='aplicado'&&c.tipo==='amarelo'){const at=team().cartoes.filter(x=>x.alvo===c.alvo&&x.tipo==='amarelo'&&x.status==='aplicado'&&!x.usado);
+    if(at.length>=2){at.slice(0,2).forEach(x=>x.usado=true);team().cartoes.push({id:nid(),alvo:c.alvo,tipo:'vermelho',motivo:'2 cartões amarelos',autor:null,auto:true,votos:{},status:'aplicado',ts:Date.now(),fim:Date.now()});log(`${nome(c.alvo)} levou vermelho automático (2 amarelos)`,'🟥')}}}
+
+/* ---------- telas ---------- */
+function vAuth(){const m=UI.auth;let f;
+  if(m==='login')f=`<form data-f="login"><label>E-mail</label><input name="email" type="email" required autocomplete="username"><label>Senha</label><input name="senha" type="password" required autocomplete="current-password"><button class="btn g big">ENTRAR</button></form>
+    <button class="lnk" data-a="auth" data-m="cad">Criar minha conta</button><button class="lnk" data-a="auth" data-m="rec">Esqueci a senha</button>`;
+  else if(m==='cad')f=`<form data-f="cad"><label>Nome completo</label><input name="nome" required><label>Apelido (como te chamam no jogo)</label><input name="apelido" required maxlength="20"><label>E-mail</label><input name="email" type="email" required autocomplete="username"><label>Senha (mínimo 6)</label><input name="senha" type="password" required minlength="6" autocomplete="new-password"><button class="btn g big">CRIAR CONTA</button></form><button class="lnk" data-a="auth" data-m="login">Já tenho conta</button>`;
+  else f=`<form data-f="rec1"><p class="mt">Digite o e-mail da sua conta. Você recebe um link para criar uma senha nova.</p><label>E-mail da conta</label><input name="email" type="email" required><button class="btn b big">ENVIAR LINK</button></form><button class="lnk" data-a="auth" data-m="login">Voltar</button>`;
+  return `<div class="auth">${crest(150)}<div class="ttl">RESENHA FC</div><p class="mt">Gestão do seu time de futsal e futebol</p>${f}</div>`}
+
+function vSemTime(){const outros=MY;
+  return `<div class="auth">${crest(90)}<div class="ttl" style="font-size:20px">Olá, ${esc(me().apelido)}</div>
+  ${outros.length?`<div class="card" style="text-align:left"><h2>Meus times</h2>${outros.map(t=>`<button class="btn big" style="margin-bottom:8px" data-a="abrirTime" data-id="${t.id}">${esc(t.nome)}</button>`).join('')}</div>`:''}
+  <div class="card" style="text-align:left"><h2>Criar um time</h2><form data-f="novoTime"><label>Nome do time</label><input name="nome" required maxlength="40"><label>Valor da mensalidade (R$)</label><input name="mens" inputmode="decimal" value="50"><button class="btn g big">CRIAR TIME</button></form></div>
+  <div class="card" style="text-align:left"><h2>Entrar em um time</h2><form data-f="entrar"><label>Código de convite</label><input name="cod" required maxlength="6" style="text-transform:uppercase"><button class="btn b big">ENTRAR NO TIME</button></form></div>
+  <button class="lnk" data-a="sair">Sair da conta</button></div>`}
+
+function vShell(){const t=team();const tabs=[['inicio','🏠','Início'],['jogos','⚽','Jogos'],['caixa','💰','Caixa'],['chat','💬','Chat'],['mais','☰','Mais']];
+  let body;if(UI.jogo&&t.jogos.find(j=>j.id===UI.jogo))body=vJogo(t.jogos.find(j=>j.id===UI.jogo));
+  else body=({inicio:vInicio,jogos:vJogos,caixa:vCaixa,chat:vChat,mais:vMais})[UI.tab]();
+  return `<div class="top">${crest(38)}<div class="ttl">${esc(t.nome)}<small>${APP} · ${esc(me().apelido)} · ${meuPapel()}</small></div></div>${body}
+  <nav class="nav"><div>${tabs.map(x=>`<button class="${UI.tab===x[0]?'on':''}" data-a="tab" data-t="${x[0]}"><b>${x[1]}</b>${x[2]}</button>`).join('')}</div></nav>`}
+
+function proxJogo(){return team().jogos.filter(j=>j.fase!=='fechado').sort((a,b)=>a.ts-b.ts)[0]}
+function presBtns(j){const meu=j.pres[me().id],fech=Date.now()>j.prazo||j.fase!=='agendado';
+  return `<div class="btns fill"><button class="btn ${meu&&meu.r==='vou'?'g':''}" data-a="pres" data-j="${j.id}" data-r="vou" ${fech?'disabled':''}>✅ VOU</button><button class="btn ${meu&&meu.r==='nao'?'r on':''}" data-a="pres" data-j="${j.id}" data-r="nao" ${fech?'disabled':''}>❌ NÃO VOU</button></div>
+  <p class="${fech?'warn':'mt'}" style="margin:8px 0 0">${j.fase!=='agendado'?'Lista fechada.':fech?'Prazo encerrado em '+dt(j.prazo):'Confirme até '+dt(j.prazo)}</p>`}
+function mensCard(){const t=team(),k=mk(Date.now()),p=pagou(me().id,k);
+  return `<div class="card ${p?'':'hl'}"><h2>Minha mensalidade · ${MES[+k.slice(5)-1]}</h2>${p?`<span class="tag g">PAGO</span> <span class="mt">em ${dt(p.ts)}</span>`
+  :`<p style="margin:0 0 10px">${money(t.mens)} · vence dia ${t.venc} <span class="tag y">PENDENTE</span></p><label class="btn g big"><input type="file" accept="image/*" hidden data-file="pagar" data-u="${me().id}" data-m="${k}">📎 ANEXAR COMPROVANTE</label><p class="mt" style="margin:8px 0 0">Ao anexar a foto ou print, a baixa é automática.</p>`}</div>`}
+function vInicio(){const t=team(),j=proxJogo(),av=t.avisos.slice().sort((a,b)=>(b.fixo?1:0)-(a.fixo?1:0)||b.ts-a.ts).slice(0,3),s=stats(me().id);
+  return `${s.susp?`<div class="card" style="border-color:var(--r)"><b style="color:var(--r)">🟥 Você está suspenso do próximo jogo.</b></div>`:''}
+  ${j?`<div class="card hl"><h2>Próximo jogo</h2><div class="row" data-a="jogo" data-id="${j.id}" style="cursor:pointer"><div class="gr"><b>${dd(j.ts)} · ${hh(j.ts)}</b><br><small>${esc(j.local)}${j.adv?' · contra '+esc(j.adv):''}</small></div><span class="tag b">abrir ›</span></div>${presBtns(j)}</div>`
+     :`<div class="card"><h2>Próximo jogo</h2><p class="mt">Nenhum jogo marcado.</p>${isAdm()?`<button class="btn g" data-a="modal" data-t="jogo">+ Marcar jogo</button>`:''}</div>`}
+  ${mensCard()}
+  <div class="grid2"><div class="card"><h2>Caixa</h2><div class="num">${money(saldo())}</div></div><div class="card"><h2>Meus números</h2><div class="mt">⚽ ${s.gols} gols · ⭐ ${s.media==null?'–':s.media.toFixed(1)}<br>🟨 ${s.amAt} · 🟥 ${s.ve}</div></div></div>
+  <div class="card"><h2>Avisos</h2>${av.length?av.map(a=>`<div class="row"><div class="gr">${a.fixo?'📌 ':''}${esc(a.texto)}<br><small>${esc(nome(a.autor))} · ${dt(a.ts)}</small></div></div>`).join(''):'<p class="mt">Sem avisos.</p>'}<button class="btn sm" style="margin-top:8px" data-a="sub" data-s="avisos">Ver todos</button></div>`}
+
+const FASE={agendado:['Agendado','b'],rolando:['Bola rolando','g'],votacao:['Votação aberta','y'],fechado:['Encerrado','']};
+function vJogos(){const t=team(),js=t.jogos.slice().sort((a,b)=>b.ts-a.ts);
+  return `<div class="btns" style="margin-bottom:12px">${isAdm()?`<button class="btn g" data-a="modal" data-t="jogo">+ Marcar jogo</button>`:''}<button class="btn" data-a="modal" data-t="sorteio">🎲 Sorteador de times</button></div>
+  ${js.length?js.map(j=>{const l=listas(j),tot=Object.values(j.gols).reduce((a,b)=>a+b,0);return `<div class="card" data-a="jogo" data-id="${j.id}" style="cursor:pointer"><div class="row"><div class="gr"><b>${dd(j.ts)} · ${hh(j.ts)}</b><br><small>${esc(j.local)}${j.adv?' · contra '+esc(j.adv):''}</small><br><small>✅ ${l.tit.length+l.res.length} · ❌ ${l.nao.length+l.falt.length} · ❔ ${l.sem.length}${j.fase!=='agendado'?' · ⚽ '+tot:''}</small></div><span class="tag ${FASE[j.fase][1]}">${FASE[j.fase][0]}</span></div></div>`}).join(''):'<div class="card"><p class="mt">Nenhum jogo ainda.</p></div>'}`}
+
+function chipsP(arr,j){return arr.length?`<div class="chips">${arr.map(m=>`<span class="chip" ${isAdm()?`data-a="modal" data-t="presAdm" data-j="${j.id}" data-u="${m.uid}"`:''}>${esc(m.nome)}${stats(m.uid).susp?' 🟥':''}</span>`).join('')}</div>`:'<span class="mt">ninguém</span>'}
+function vJogo(j){const l=listas(j),ps=part(j),adm=isAdm(),eu=me().id;
+  const prox={agendado:['▶ INICIAR JOGO (fecha a lista)','rolando'],rolando:['🏁 FINALIZAR JOGO E ABRIR VOTAÇÃO','votacao'],votacao:['🔒 FECHAR VOTAÇÃO','fechado']}[j.fase];
+  let h=`<button class="btn sm" data-a="voltar">‹ Voltar</button>
+  <div class="card hl" style="margin-top:10px"><div class="row"><div class="gr"><b style="font-size:17px">${dd(j.ts)} · ${hh(j.ts)}</b><br><small>${esc(j.local)}${j.adv?' · contra '+esc(j.adv):''} · ${j.vagas} titulares</small></div><span class="tag ${FASE[j.fase][1]}">${FASE[j.fase][0]}</span></div>
+  ${adm&&prox?`<button class="btn g big" style="margin-top:10px" data-a="fase" data-j="${j.id}" data-f="${prox[1]}">${prox[0]}</button>`:''}
+  ${adm?`<div class="btns" style="margin-top:8px"><button class="btn sm" data-a="modal" data-t="jogo" data-j="${j.id}">Editar</button><button class="btn sm r" data-a="conf" data-k="delJogo" data-j="${j.id}" data-msg="Apagar este jogo e tudo que foi registrado nele?">Apagar jogo</button></div>`:''}</div>
+  <div class="card"><h2>Lista de presença</h2>${presBtns(j)}
+  <h3>Titulares (${l.tit.length}/${j.vagas})</h3>${chipsP(l.tit,j)}
+  <h3>Reservas (${l.res.length})</h3>${chipsP(l.res,j)}
+  <h3>Não vão (${l.nao.length})</h3>${chipsP(l.nao,j)}
+  ${l.falt.length?`<h3 style="color:var(--r)">Faltaram sem avisar (${l.falt.length})</h3>${chipsP(l.falt,j)}`:''}
+  <h3>Sem resposta (${l.sem.length})</h3>${chipsP(l.sem,j)}
+  ${adm?'<p class="mt" style="margin:10px 0 0">Toque em um nome para mudar a presença dele.</p>':''}</div>
+  <div class="card"><h2>Times</h2>${j.times?j.times.map(x=>`<h3 style="color:${x.cor}">${esc(x.nome)} ${j.fase!=='agendado'?'· '+x.jog.reduce((s,u)=>s+(j.gols[u]||0),0)+' gols':''}</h3><div class="chips">${x.jog.map(u=>`<span class="chip">${esc(nome(u))}</span>`).join('')}</div>`).join(''):'<p class="mt">Ainda não sorteados.</p>'}
+  ${adm&&j.fase!=='fechado'?`<button class="btn b" style="margin-top:10px" data-a="modal" data-t="sorteio" data-j="${j.id}">🎲 ${j.times?'Sortear de novo':'Sortear times'}</button>`:''}</div>`;
+  if(j.fase!=='agendado'){const tot=Object.values(j.gols).reduce((a,b)=>a+b,0);
+    h+=`<div class="card"><h2>Gols · total ${tot}${j.adv?' × '+(j.contra||0)+' '+esc(j.adv):''}</h2>
+    ${ps.map(m=>`<div class="row"><div class="gr">${esc(m.nome)}</div><div class="cnt">${adm&&j.fase==='rolando'?`<button class="btn sm" data-a="gol" data-j="${j.id}" data-u="${m.uid}" data-d="-1">−</button>`:''}<b>${j.gols[m.uid]||0}</b>${adm&&j.fase==='rolando'?`<button class="btn sm g" data-a="gol" data-j="${j.id}" data-u="${m.uid}" data-d="1">+ GOL</button>`:''}</div></div>`).join('')||'<p class="mt">Ninguém confirmado.</p>'}
+    ${j.adv?`<div class="row"><div class="gr">Gols de ${esc(j.adv)}</div><div class="cnt">${adm&&j.fase==='rolando'?`<button class="btn sm" data-a="gol" data-j="${j.id}" data-u="_adv" data-d="-1">−</button>`:''}<b style="color:var(--r)">${j.contra||0}</b>${adm&&j.fase==='rolando'?`<button class="btn sm" data-a="gol" data-j="${j.id}" data-u="_adv" data-d="1">+</button>`:''}</div></div>`:''}</div>`}
+  if(j.fase==='votacao'||j.fase==='fechado'){const ab=j.fase==='votacao',jogou=ps.some(m=>m.uid===eu)||true,minhas=j.notas[eu]||{},vj=vencJogada(j);
+    h+=`<div class="card"><h2>Notas dos jogadores</h2>${ab?'<p class="mt">Dê sua nota de 0 a 10. Você não vota em você mesmo.</p>':''}
+    ${ps.map(m=>{const md=notaJogo(j,m.uid);return `<div class="row"><div class="gr">${esc(m.nome)}<br><small>média ${md==null?'–':md.toFixed(1)}</small></div>${ab&&m.uid!==eu?`<select style="width:86px;margin:0" data-ch="nota" data-j="${j.id}" data-u="${m.uid}"><option value="">nota</option>${[10,9,8,7,6,5,4,3,2,1,0].map(n=>`<option ${minhas[m.uid]===n?'selected':''}>${n}</option>`).join('')}</select>`:`<span class="num" style="font-size:18px">${md==null?'–':md.toFixed(1)}</span>`}</div>`}).join('')}</div>
+    <div class="card"><h2>Jogada mais bonita</h2>${ab?`<select data-ch="jogada" data-j="${j.id}"><option value="">Escolha quem fez</option>${ps.filter(m=>m.uid!==eu).map(m=>`<option value="${m.uid}" ${j.jogada[eu]===m.uid?'selected':''}>${esc(m.nome)}</option>`).join('')}</select>`:''}
+    ${vj?`<p style="margin:0">🏆 ${ab?'Na frente':'Vencedor'}: <b style="color:var(--g)">${esc(nome(vj))}</b> <span class="mt">(${Object.values(j.jogada).filter(x=>x===vj).length} votos)</span></p>`:'<p class="mt" style="margin:0">Sem votos ainda.</p>'}</div>`}
+  return h}
+
+function vCaixa(){const t=team(),k=UI.mes,tes=isTes(),lan=t.caixa.filter(c=>mk(c.ts)===k).sort((a,b)=>b.ts-a.ts),
+  ent=lan.filter(c=>!c.estornado&&c.tipo==='entrada').reduce((s,c)=>s+c.valor,0),sai=lan.filter(c=>!c.estornado&&c.tipo==='saida').reduce((s,c)=>s+c.valor,0),pg=t.membros.filter(m=>pagou(m.uid,k)).length;
+  return `<div class="card hl"><h2>Dinheiro em caixa</h2><div class="num">${money(saldo())}</div></div>
+  <div class="card"><div class="btns fill" style="align-items:center"><button class="btn sm" data-a="mes" data-d="-1">‹</button><b style="text-align:center;flex:3">${mesNome(k)}</b><button class="btn sm" data-a="mes" data-d="1">›</button></div>
+  <div class="grid2" style="margin-top:10px"><div><span class="mt">Entradas</span><br><b style="color:var(--g)">${money(ent)}</b></div><div><span class="mt">Saídas</span><br><b style="color:var(--r)">${money(sai)}</b></div></div></div>
+  <div class="card"><h2>Mensalidades · ${pg}/${t.membros.length} pagas</h2>
+  ${t.membros.map(m=>{const p=pagou(m.uid,k),meu=m.uid===me().id;return `<div class="row"><div class="gr">${esc(m.nome)}${p?`<br><small>pago em ${dt(p.ts)}</small>`:''}</div>
+    ${p?`<span class="tag g">PAGO</span>${p.comp?`<button class="btn sm" data-a="modal" data-t="comp" data-p="${p.id}">ver</button>`:''}${tes?`<button class="btn sm r" data-a="conf" data-k="estornar" data-p="${p.id}" data-msg="Estornar a mensalidade de ${esc(m.nome)}? O valor sai do caixa.">estornar</button>`:''}`
+    :`<span class="tag y">PENDENTE</span>${meu||tes?`<label class="btn sm g"><input type="file" accept="image/*" hidden data-file="pagar" data-u="${m.uid}" data-m="${k}">📎 anexar</label>`:''}${tes?`<button class="btn sm" data-a="baixa" data-u="${m.uid}">baixa manual</button>`:''}`}</div>`}).join('')}</div>
+  <div class="card"><h2>Relatório de ${MES[+k.slice(5)-1]}</h2>${tes?`<div class="btns" style="margin-bottom:8px"><button class="btn sm g" data-a="modal" data-t="lanc" data-tp="entrada">+ Entrada</button><button class="btn sm r" data-a="modal" data-t="lanc" data-tp="saida">+ Saída</button></div>`:''}
+  ${lan.length?`<table><tr><th>Data e hora</th><th>Descrição</th><th class="n">Valor</th></tr>${lan.map(c=>`<tr style="${c.estornado?'opacity:.45;text-decoration:line-through':''}"><td>${dt(c.ts)}</td><td>${esc(c.desc)}${c.estornado?' (estornado)':''}</td><td class="n" style="color:${c.tipo==='entrada'?'var(--g)':'var(--r)'}">${c.tipo==='entrada'?'+':'−'}${money(c.valor)}</td></tr>`).join('')}</table>`:'<p class="mt">Sem lançamentos neste mês.</p>'}
+  <button class="btn sm" style="margin-top:10px" data-a="copiarRel">📋 Copiar relatório</button></div>`}
+
+function chatItens(){const t=team(),q=UI.busca.trim().toLowerCase(),ms=t.chat.filter(m=>!q||m.texto.toLowerCase().includes(q)||nome(m.uid).toLowerCase().includes(q));
+  return ms.length?ms.map(m=>`<div class="msg ${m.uid===me().id?'me':''}"><small>${esc(nome(m.uid))} · ${dt(m.ts)}</small>${esc(m.texto)}</div>`).join(''):`<p class="mt" style="text-align:center">${q?'Nada encontrado.':'Nenhuma mensagem ainda. Comece a resenha!'}</p>`}
+function vChat(){return `<input id="busca" placeholder="🔎 Pesquisar no histórico do chat" value="${esc(UI.busca)}" data-in="busca" style="margin-top:0">
+  <div class="card" style="padding:8px"><div id="chatlist">${chatItens()}</div></div>
+  <form data-f="chat" class="btns"><input name="t" id="chatin" placeholder="Mensagem" autocomplete="off" maxlength="500" style="flex:1;margin:0;width:auto"><button class="btn g">Enviar</button></form>`}
+
+function vMais(){const s=UI.sub;if(s)return `<button class="btn sm" data-a="sub" data-s="" style="margin-bottom:10px">‹ Voltar</button>`+({ranking:vRanking,cartoes:vCartoes,avisos:vAvisos,linha:vLinha,elenco:vElenco,config:vConfig,conta:vConta})[s]();
+  const it=[['ranking','🏆','Ranking e artilharia'],['cartoes','🟨','Cartões por votação'],['avisos','📢','Avisos gerais'],['linha','🕒','Linha do tempo'],['elenco','👥','Elenco']];
+  if(isAdm())it.push(['config','⚙️','Configurações do time']);it.push(['conta','👤','Minha conta']);
+  return `<div class="card">${it.map(x=>`<div class="row" data-a="sub" data-s="${x[0]}" style="cursor:pointer"><span style="font-size:22px">${x[1]}</span><div class="gr"><b>${x[2]}</b></div><span class="mt">›</span></div>`).join('')}<div class="row" data-a="modal" data-t="sorteio" style="cursor:pointer"><span style="font-size:22px">🎲</span><div class="gr"><b>Sorteador de times</b></div><span class="mt">›</span></div></div>`}
+
+function vRanking(){const ms=team().membros.map(m=>({m,s:stats(m.uid)}));const tb=(tit,key,f)=>{const a=ms.filter(x=>x.s[key]!=null&&x.s[key]>0).sort((a,b)=>b.s[key]-a.s[key]).slice(0,10);
+  return `<div class="card"><h2>${tit}</h2>${a.length?a.map((x,i)=>`<div class="row"><b style="width:24px;color:var(--b)">${i+1}º</b><div class="gr">${esc(x.m.nome)}</div><span class="num" style="font-size:18px">${f(x.s[key])}</span></div>`).join(''):'<p class="mt">Sem dados ainda.</p>'}</div>`};
+  return tb('⚽ Artilharia','gols',v=>v)+tb('⭐ Melhores médias','media',v=>v.toFixed(1))+tb('🏆 Jogadas mais bonitas','jb',v=>v)+tb('✅ Mais presentes','jg',v=>v)}
+
+function vCartoes(){const t=team(),ab=t.cartoes.filter(c=>c.status==='aberta'),hist=t.cartoes.filter(c=>c.status!=='aberta').sort((a,b)=>b.ts-a.ts),eu=me().id;
+  return `<div class="card"><h2>Regras</h2><p style="white-space:pre-wrap;margin:0">${esc(t.regras)}</p></div>
+  <button class="btn g big" style="margin-bottom:12px" data-a="modal" data-t="cartao">+ PROPOR CARTÃO</button>
+  <div class="card"><h2>Votações abertas</h2>${ab.length?ab.map(c=>{const el=eleitores(c),sim=Object.values(c.votos).filter(v=>v==='sim').length,nao=Object.values(c.votos).filter(v=>v==='nao').length,pode=el.some(m=>m.uid===eu);
+    return `<div class="row" style="display:block"><b>${c.tipo==='amarelo'?'🟨':'🟥'} ${esc(nome(c.alvo))}</b><br><span>${esc(c.motivo)}</span><br><small class="mt">proposto por ${esc(nome(c.autor))} · ${dt(c.ts)} · ${sim} sim × ${nao} não · precisa de ${Math.floor(el.length/2)+1}</small>
+    <div class="btns" style="margin-top:8px">${pode?`<button class="btn sm ${c.votos[eu]==='sim'?'g':''}" data-a="voto" data-c="${c.id}" data-v="sim">Merece</button><button class="btn sm ${c.votos[eu]==='nao'?'on':''}" data-a="voto" data-c="${c.id}" data-v="nao">Não merece</button>`:'<span class="mt">Você não vota no seu próprio cartão.</span>'}${isAdm()?`<button class="btn sm" data-a="encerrarVoto" data-c="${c.id}">Encerrar votação</button>`:''}</div></div>`}).join(''):'<p class="mt">Nenhuma votação aberta.</p>'}</div>
+  <div class="card"><h2>Histórico</h2>${hist.length?hist.map(c=>`<div class="row"><div class="gr">${c.tipo==='amarelo'?'🟨':'🟥'} <b>${esc(nome(c.alvo))}</b> · ${esc(c.motivo)}<br><small>${dt(c.ts)}${c.tipo==='vermelho'&&c.status==='aplicado'?(c.cumprido?' · suspensão cumprida':' · suspenso do próximo jogo'):''}</small></div><span class="tag ${c.status==='aplicado'?'r':''}">${c.status}</span>${isAdm()&&c.tipo==='vermelho'&&c.status==='aplicado'&&!c.cumprido?`<button class="btn sm" data-a="cumprido" data-c="${c.id}">cumpriu</button>`:''}</div>`).join(''):'<p class="mt">Nenhum cartão ainda.</p>'}</div>`}
+
+function vAvisos(){const t=team(),av=t.avisos.slice().sort((a,b)=>(b.fixo?1:0)-(a.fixo?1:0)||b.ts-a.ts);
+  return `${isAdm()?`<div class="card"><h2>Novo aviso</h2><form data-f="aviso"><textarea name="t" rows="3" required maxlength="600" placeholder="Escreva o aviso para o time"></textarea><label class="ck"><input type="checkbox" name="fixo">Fixar no topo</label><button class="btn g">Publicar aviso</button></form></div>`:''}
+  <div class="card"><h2>Avisos gerais</h2>${av.length?av.map(a=>`<div class="row"><div class="gr" style="white-space:pre-wrap">${a.fixo?'📌 ':''}${esc(a.texto)}<br><small>${esc(nome(a.autor))} · ${dt(a.ts)}</small></div>${isAdm()?`<button class="btn sm r" data-a="conf" data-k="delAviso" data-i="${a.id}" data-msg="Apagar este aviso?">apagar</button>`:''}</div>`).join(''):'<p class="mt">Sem avisos.</p>'}</div>`}
+
+function linhaItens(){const q=UI.busca.trim().toLowerCase(),a=team().timeline.filter(e=>!q||e.texto.toLowerCase().includes(q)).sort((x,y)=>y.ts-x.ts).slice(0,300);
+  return a.length?a.map(e=>`<div>${e.ic} ${esc(e.texto)}<br><small class="mt">${dt(e.ts)}</small></div>`).join(''):'<p class="mt">Nada por aqui.</p>'}
+function vLinha(){return `<input placeholder="🔎 Pesquisar na linha do tempo" value="${esc(UI.busca)}" data-in="busca" style="margin-top:0"><div class="card"><h2>Linha do tempo</h2><div class="tl" id="linha">${linhaItens()}</div></div>`}
+
+function vElenco(){const t=team(),adm=isAdm();
+  return `<div class="card"><h2>Código de convite</h2><div class="num">${t.cod}</div><p class="mt" style="margin:4px 0 0">Passe este código para o jogador entrar no time.</p></div>
+  <div class="card"><h2>Elenco (${t.membros.length})</h2>${t.membros.map(m=>{const s=stats(m.uid);return `<div class="row" ${adm?`data-a="modal" data-t="membro" data-u="${m.uid}" style="cursor:pointer"`:''}><div class="gr"><b>${esc(m.nome)}</b> ${m.papel!=='jogador'?`<span class="tag b">${m.papel}</span>`:''} ${m.semConta?'<span class="tag">sem conta</span>':''} ${s.susp?'<span class="tag r">suspenso</span>':''}<br><small>${esc(m.pos||'posição livre')} · ⚽ ${s.gols} · ⭐ ${s.media==null?'–':s.media.toFixed(1)} · 🟨 ${s.amAt} · 🟥 ${s.ve}</small></div>${adm?'<span class="mt">›</span>':''}</div>`}).join('')}</div>
+  ${adm?`<div class="card"><h2>Adicionar jogador sem conta</h2><p class="mt" style="margin-top:0">Para quem ainda não usa o app. Você confirma presença e dá baixa por ele.</p><form data-f="avulso" class="btns"><input name="nome" required maxlength="20" placeholder="Apelido do jogador" style="flex:1;margin:0;width:auto"><button class="btn g">Adicionar</button></form></div>`:''}`}
+
+function vConfig(){const t=team();return `<div class="card"><h2>Configurações do time</h2><form data-f="config"><label>Nome do time</label><input name="nome" required value="${esc(t.nome)}"><div class="grid2"><div><label>Mensalidade (R$)</label><input name="mens" inputmode="decimal" value="${String(t.mens).replace('.',',')}"></div><div><label>Dia do vencimento</label><input name="venc" type="number" min="1" max="31" value="${t.venc}"></div></div><label>Titulares por jogo (padrão)</label><input name="vagas" type="number" min="1" max="30" value="${t.vagas}"><label>Regras dos cartões</label><textarea name="regras" rows="6">${esc(t.regras)}</textarea><button class="btn g big">SALVAR</button></form></div>`}
+function vConta(){const u=me();return `<div class="card"><h2>Minha conta</h2><p style="margin:0 0 10px"><b>${esc(u.nome)}</b><br><span class="mt">${esc(u.email)}</span></p><form data-f="perfil"><label>Apelido no time</label><input name="apelido" required maxlength="20" value="${esc(mem_(u.id).nome)}"><label>Posição</label><select name="pos">${['','Goleiro','Fixo','Ala','Pivô','Zagueiro','Lateral','Meia','Atacante'].map(p=>`<option ${mem_(u.id).pos===p?'selected':''}>${p}</option>`).join('')}</select><button class="btn g">Salvar</button></form></div>
+  <div class="card"><h2>Trocar senha</h2><form data-f="senha"><label>Senha atual</label><input name="a" type="password" required><label>Nova senha (mínimo 6)</label><input name="n" type="password" required minlength="6"><button class="btn b">Trocar senha</button></form></div>
+  <div class="btns"><button class="btn" data-a="trocarTime">Trocar de time / criar outro</button><button class="btn r" data-a="sair">Sair da conta</button></div>`}
+
+/* ---------- janelas ---------- */
+function vModal(){const m=UI.modal,t=team();let h='';const x=`<button class="btn" type="button" data-a="fechar">Cancelar</button>`;
+  if(m.t==='conf')h=`<p style="font-size:16px">${esc(m.msg)}</p><div class="btns fill">${x}<button class="btn g" data-a="confOk">Confirmar</button></div>`;
+  else if(m.t==='jogo'){const j=m.j&&t.jogos.find(q=>q.id===m.j),d=j?new Date(j.ts):null,pz=j?new Date(j.prazo):null,iso=q=>q.getFullYear()+'-'+p2(q.getMonth()+1)+'-'+p2(q.getDate()),hr=q=>p2(q.getHours())+':'+p2(q.getMinutes());
+    h=`<h2>${j?'Editar jogo':'Marcar jogo'}</h2><form data-f="jogo"><div class="grid2"><div><label>Data</label><input name="d" type="date" required value="${d?iso(d):''}"></div><div><label>Horário</label><input name="h" type="time" required value="${d?hr(d):'20:00'}"></div></div><label>Local</label><input name="local" required maxlength="60" value="${j?esc(j.local):''}"><label>Adversário (deixe vazio se for jogo entre nós)</label><input name="adv" maxlength="40" value="${j?esc(j.adv):''}"><label>Titulares</label><input name="vagas" type="number" min="1" max="30" value="${j?j.vagas:t.vagas}"><div class="grid2"><div><label>Prazo final para confirmar</label><input name="pd" type="date" value="${pz?iso(pz):''}"></div><div><label>Hora do prazo</label><input name="ph" type="time" value="${pz?hr(pz):'18:00'}"></div></div><p class="mt" style="margin-top:0">Sem prazo preenchido, vale até 2 horas antes do jogo.</p><div class="btns fill">${x}<button class="btn g">Salvar jogo</button></div></form>`}
+  else if(m.t==='presAdm'){h=`<h2>Presença de ${esc(nome(m.u))}</h2><div class="btns fill" style="flex-direction:column">${[['vou','✅ Vai / foi'],['nao','❌ Não vai'],['faltou','🚫 Faltou sem avisar'],['','❔ Sem resposta']].map(o=>`<button class="btn" data-a="presSet" data-r="${o[0]}">${o[1]}</button>`).join('')}${x}</div>`}
+  else if(m.t==='sorteio'){const j=m.j&&t.jogos.find(q=>q.id===m.j);
+    if(m.res)h=`<h2>Times sorteados</h2>${m.res.map(q=>`<h3 style="color:${q.cor}">${esc(q.nome)} (${q.jog.length})</h3><div class="chips">${q.jog.map(u=>`<span class="chip">${esc(nome(u))}</span>`).join('')}</div>`).join('')}<div class="btns fill" style="margin-top:14px"><button class="btn" data-a="resortear">🎲 Sortear de novo</button><button class="btn g" data-a="fechar">Pronto</button></div>`;
+    else h=`<h2>Sorteador de times</h2><form data-f="sorteio">${j?`<p class="mt">Entram os ${part(j).length} confirmados do jogo.</p>`:`<label>Quem vai jogar</label><div style="max-height:230px;overflow:auto;margin-bottom:8px">${t.membros.map(q=>`<label class="ck"><input type="checkbox" name="u" value="${q.uid}" checked>${esc(q.nome)}</label>`).join('')}</div>`}<label>Quantos times</label><select name="n"><option>2</option><option>3</option><option>4</option></select><label class="ck"><input type="checkbox" name="eq" checked>Equilibrar pelas notas dos jogadores</label><div class="btns fill" style="margin-top:8px">${x}<button class="btn g">🎲 SORTEAR</button></div></form>`}
+  else if(m.t==='lanc')h=`<h2>${m.tp==='entrada'?'Nova entrada':'Nova saída'}</h2><form data-f="lanc"><label>Descrição</label><input name="desc" required maxlength="60" placeholder="${m.tp==='entrada'?'Ex.: patrocínio, rifa':'Ex.: aluguel da quadra, bola'}"><label>Valor (R$)</label><input name="valor" inputmode="decimal" required><div class="btns fill">${x}<button class="btn g">Lançar</button></div></form>`;
+  else if(m.t==='comp'){const p=t.pagamentos.find(q=>q.id===m.p);h=`<h2>Comprovante</h2><p class="mt">${esc(nome(p.uid))} · ${mesNome(p.mes)} · ${money(p.valor)}<br>Enviado em ${dt(p.ts)}</p>${m.img&&/^data:image\//.test(m.img)?`<img class="comp" src="${esc(m.img)}" alt="Comprovante">`:`<p class="mt">${esc(m.err||'Carregando…')}</p>`}<button class="btn big" style="margin-top:10px" data-a="fechar">Fechar</button>`}
+  else if(m.t==='cartao')h=`<h2>Propor cartão</h2><form data-f="cartao"><label>Jogador</label><select name="alvo" required><option value="">Escolha</option>${t.membros.filter(q=>q.uid!==me().id).map(q=>`<option value="${q.uid}">${esc(q.nome)}</option>`).join('')}</select><label>Cartão</label><select name="tipo"><option value="amarelo">🟨 Amarelo</option><option value="vermelho">🟥 Vermelho</option></select><label>Motivo</label><textarea name="motivo" rows="3" required maxlength="200"></textarea><div class="btns fill">${x}<button class="btn g">Abrir votação</button></div></form>`;
+  else if(m.t==='membro'){const q=mem_(m.u),eu=q.uid===me().id;h=`<h2>${esc(q.nome)}</h2><form data-f="membro"><label>Apelido</label><input name="nome" required maxlength="20" value="${esc(q.nome)}"><label>Função</label><select name="papel" ${eu||q.semConta?'disabled':''}>${['jogador','tesoureiro','admin'].map(p=>`<option ${q.papel===p?'selected':''}>${p}</option>`).join('')}</select><div class="btns fill">${x}<button class="btn g">Salvar</button></div></form>${eu?'':`<button class="btn r big" style="margin-top:10px" data-a="conf" data-k="delMembro" data-u="${q.uid}" data-msg="Remover ${esc(q.nome)} do time? O histórico dele continua guardado.">Remover do time</button>`}`}
+  return `<div class="modal" data-a="fundo"><div>${h}</div></div>`}
+
+function render(keep){const a=$('#app');let h;
+  if(BOOT||LOADING)h=`<div class="auth" style="padding-top:80px">${crest(120)}<p class="mt">Carregando…</p></div>`;else if(!me())h=vAuth();else if(!team())h=vSemTime();else h=vShell();
+  let md='';if(UI.modal&&team()&&!LOADING&&!BOOT){try{md=vModal()}catch(e){UI.modal=null}}
+  a.innerHTML=h+md;const c=$('#chatlist');if(c)c.scrollTop=c.scrollHeight;if(keep){const e=$(keep);if(e)e.focus()}}
+/* atualização vinda de outro aparelho: redesenha sem apagar o que a pessoa está digitando */
+function soft(){const ks=()=>{const cnt={},r=[];document.querySelectorAll('#app input,#app textarea,#app select').forEach(e=>{if(e.type==='file'||e.dataset.ch)return;const f=e.closest('form[data-f]'),b=(f?f.dataset.f:'')+'|'+(e.name||e.id||e.dataset.in||'');cnt[b]=(cnt[b]||0)+1;r.push([b+'|'+cnt[b],e])});return r};
+  const ae=document.activeElement,st={};let fk=null;ks().forEach(([k,e])=>{st[k]=e.type==='checkbox'?e.checked:e.value;if(e===ae)fk=k});const y=window.scrollY;
+  render();ks().forEach(([k,e])=>{if(k in st){if(e.type==='checkbox')e.checked=st[k];else e.value=st[k]}if(k===fk)e.focus()});window.scrollTo(0,y)}
+
+/* ---------- ações ---------- */
+function sortear(uids,n,eq){let a=uids.slice();for(let i=a.length-1;i>0;i--){const k=Math.floor(Math.random()*(i+1));[a[i],a[k]]=[a[k],a[i]]}
+  if(eq)a=a.map(u=>({u,m:(stats(u).media==null?6:stats(u).media)+Math.random()*.4})).sort((x,y)=>y.m-x.m).map(x=>x.u);
+  const ts=[];for(let i=0;i<n;i++)ts.push({nome:'Time '+CORES[i][0],cor:CORES[i][1],jog:[]});
+  a.forEach((u,i)=>{const r=Math.floor(i/n),p=i%n;ts[r%2?n-1-p:p].jog.push(u)});return ts}
+function comprimir(file){return new Promise((ok,no)=>{const fr=new FileReader();fr.onerror=no;fr.onload=()=>{const im=new Image();im.onerror=no;im.onload=()=>{const mx=720,k=Math.min(1,mx/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.6))};im.src=fr.result};fr.readAsDataURL(file)})}
+function darBaixa(uid,mes,comp){const t=team();if(pagou(uid,mes))return toast('Este mês já está pago.',1);
+  const p={id:nid(),uid,mes,valor:t.mens,ts:Date.now(),comp:!!comp,status:'pago',por:me().id};
+  (comp?tref().collection('comps').doc(p.id).set({img:comp,ts:p.ts}):Promise.resolve()).then(()=>{if(!team()||team().id!==t.id||pagou(uid,mes))return;
+    t.pagamentos.push(p);t.caixa.push({id:nid(),tipo:'entrada',desc:'Mensalidade '+MES[+mes.slice(5)-1]+' · '+nome(uid),valor:t.mens,ts:p.ts,autor:me().id,pag:p.id});
+    log(`${nome(uid)} pagou a mensalidade de ${mesNome(mes)} (${money(t.mens)})${comp?' com comprovante':' · baixa manual por '+nome(me().id)}`,'💰');
+    save();toast('Baixa feita! '+money(t.mens)+' no caixa.');render()},()=>toast('O comprovante não subiu. Confira a internet e anexe de novo.',1))}
+
+const A={
+ auth(d){UI.auth=d.m;UI.rec=null;render()},
+ tab(d){UI.tab=d.t;UI.jogo=null;UI.sub=null;UI.busca='';render()},
+ sub(d){UI.tab='mais';UI.jogo=null;UI.sub=d.s||null;UI.busca='';render()},
+ jogo(d){UI.jogo=d.id;UI.tab='jogos';render();window.scrollTo(0,0)},
+ voltar(){UI.jogo=null;render()},
+ modal(d){const mm=UI.modal={t:d.t,j:d.j,u:d.u,p:d.p,tp:d.tp};render();if(d.t==='comp')tref().collection('comps').doc(d.p).get().then(s=>{if(UI.modal!==mm)return;if(s.exists)mm.img=s.data().img;else mm.err='Comprovante não encontrado.';render()},()=>{if(UI.modal!==mm)return;mm.err='Não consegui carregar. Confira a internet.';render()})},
+ fechar(){UI.modal=null;render()},
+ fundo(d,el,e){if(e.target===el){UI.modal=null;render()}},
+ conf(d){UI.modal={t:'conf',msg:d.msg,k:d.k,d:Object.assign({},d)};render()},
+ confOk(){const m=UI.modal;UI.modal=null;C[m.k](m.d);save();render()},
+ sair(){closeTeam();UI={tab:'inicio',sub:null,jogo:null,auth:'login',modal:null,mes:mk(Date.now()),busca:''};auth.signOut()},
+ trocarTime(){closeTeam();ME.ultimo=null;fs.collection('users').doc(ME.id).update({ultimo:null}).catch(()=>{});UI.jogo=null;UI.sub=null;render()},
+ abrirTime(d){UI.tab='inicio';UI.jogo=null;UI.sub=null;openTeam(d.id)},
+ pres(d){const j=team().jogos.find(q=>q.id===d.j);if(Date.now()>j.prazo||j.fase!=='agendado')return toast('Prazo encerrado.',1);
+  const at=j.pres[me().id];if(at&&at.r===d.r)return;j.pres[me().id]={r:d.r,t:Date.now()};log(`${nome(me().id)} ${d.r==='vou'?'confirmou presença':'avisou que não vai'} no jogo de ${dd(j.ts)}`,d.r==='vou'?'✅':'❌');save();render()},
+ presSet(d){const m=UI.modal,j=team().jogos.find(q=>q.id===m.j);if(d.r)j.pres[m.u]={r:d.r,t:(j.pres[m.u]&&j.pres[m.u].r==='vou'&&d.r==='vou')?j.pres[m.u].t:Date.now()};else delete j.pres[m.u];
+  if(d.r==='faltou')log(`${nome(m.u)} faltou sem avisar no jogo de ${dd(j.ts)}`,'🚫');UI.modal=null;save();render()},
+ fase(d){const j=team().jogos.find(q=>q.id===d.j);j.fase=d.f;log({rolando:`Começou o jogo de ${dd(j.ts)}`,votacao:`Fim de jogo (${dd(j.ts)}). Votação de notas aberta`,fechado:`Votação do jogo de ${dd(j.ts)} encerrada`}[d.f],{rolando:'▶',votacao:'🏁',fechado:'🔒'}[d.f]);
+  if(d.f==='fechado'){const v=vencJogada(j);if(v)log(`Jogada mais bonita do jogo de ${dd(j.ts)}: ${nome(v)}`,'🏆')}save();render()},
+ gol(d){const j=team().jogos.find(q=>q.id===d.j),k=+d.d;if(d.u==='_adv')j.contra=Math.max(0,(j.contra||0)+k);else{j.gols[d.u]=Math.max(0,(j.gols[d.u]||0)+k);if(!j.gols[d.u])delete j.gols[d.u];if(k>0)log(`Gol de ${nome(d.u)}!`,'⚽')}save();render()},
+ mes(d){UI.mes=mesAdd(UI.mes,+d.d);render()},
+ baixa(d){darBaixa(d.u,UI.mes,null)},
+ copiarRel(){const t=team(),k=UI.mes,lan=t.caixa.filter(c=>mk(c.ts)===k&&!c.estornado).sort((a,b)=>a.ts-b.ts);
+  const txt=`${t.nome} · Relatório de ${mesNome(k)}\n`+lan.map(c=>`${dt(c.ts)} · ${c.tipo==='entrada'?'+':'-'}${money(c.valor)} · ${c.desc}`).join('\n')+`\nSaldo em caixa: ${money(saldo())}`;
+  try{navigator.clipboard.writeText(txt).then(()=>toast('Relatório copiado.'),()=>toast('Não deu para copiar neste aparelho.',1))}catch(e){toast('Não deu para copiar neste aparelho.',1)}},
+ voto(d){const c=team().cartoes.find(q=>q.id===d.c);if(c.status!=='aberta')return;c.votos[me().id]=d.v;apurar(c);save();render()},
+ encerrarVoto(d){const c=team().cartoes.find(q=>q.id===d.c);apurar(c,true);save();render()},
+ cumprido(d){team().cartoes.find(q=>q.id===d.c).cumprido=true;save();render()},
+ resortear(){const m=UI.modal;m.res=sortear(m.uids,m.n,m.eq);if(m.j)team().jogos.find(q=>q.id===m.j).times=m.res;save();render()}
+};
+const C={
+ delJogo(d){const t=team(),j=t.jogos.find(q=>q.id===d.j);t.jogos=t.jogos.filter(q=>q.id!==d.j);UI.jogo=null;log(`Jogo de ${dd(j.ts)} foi apagado por ${nome(me().id)}`,'🗑')},
+ estornar(d){const t=team(),p=t.pagamentos.find(q=>q.id===d.p);p.status='estornado';const c=t.caixa.find(q=>q.pag===p.id);if(c)c.estornado=true;log(`Mensalidade de ${nome(p.uid)} (${mesNome(p.mes)}) estornada por ${nome(me().id)}`,'↩')},
+ delAviso(d){const t=team();t.avisos=t.avisos.filter(q=>q.id!==d.i)},
+ delMembro(d){const t=team(),n=nome(d.u);t.membros=t.membros.filter(q=>q.uid!==d.u);t.timeline.push({id:nid(),texto:n+' saiu do time',ic:'👋',ts:Date.now()})}
+};
+const F={
+ async login(v){await auth.signInWithEmailAndPassword(v.email.trim(),v.senha)},
+ async cad(v){if(v.senha.length<6)return toast('Senha com no mínimo 6 caracteres.',1);PEND={nome:v.nome.trim(),apelido:v.apelido.trim()};await auth.createUserWithEmailAndPassword(v.email.trim(),v.senha);toast('Conta criada!')},
+ async rec1(v){await auth.sendPasswordResetEmail(v.email.trim());UI.auth='login';render();toast('Enviamos o link para o seu e-mail. Veja também a caixa de spam.')},
+ async novoTime(v){const u=me(),nm=v.nome.trim();let cod,ex;do{cod=Math.random().toString(36).slice(2,8).toUpperCase().replace(/[O0I1]/g,'X');ex=cod.length<6||(await fs.collection('codes').doc(cod).get()).exists}while(ex);
+  const ref=fs.collection('teams').doc(),b=fs.batch();
+  b.set(ref,{nome:nm,cod,mens:num(v.mens)||0,venc:10,vagas:10,regras:'• Cartão é dado por votação de todo o time.\n• É aplicado quando mais da metade vota "Merece".\n• 2 amarelos = 1 vermelho.\n• Vermelho = suspenso do próximo jogo.',criado:Date.now(),uids:[u.id],membros:{[u.id]:{uid:u.id,nome:u.apelido,papel:'admin',pos:'',desde:Date.now()}}});
+  b.set(fs.collection('codes').doc(cod),{tid:ref.id});await b.commit();
+  await ref.collection('timeline').doc(nid()).set({texto:`Time ${nm} criado por ${u.apelido}`,ic:'🛡',ts:Date.now()});
+  MY.push({id:ref.id,nome:nm});UI.tab='inicio';openTeam(ref.id);toast('Time criado!')},
+ async entrar(v){const u=me(),s=await fs.collection('codes').doc(v.cod.trim().toUpperCase()).get();if(!s.exists)return toast('Código não encontrado.',1);
+  const tid=s.data().tid,ref=fs.collection('teams').doc(tid),d=(await ref.get()).data();if(!d)return toast('Time não encontrado.',1);
+  if(!(d.uids||[]).includes(u.id)){await ref.update({['membros.'+u.id]:{uid:u.id,nome:u.apelido,papel:'jogador',pos:'',desde:Date.now()},uids:FV.arrayUnion(u.id)});
+    await ref.collection('timeline').doc(nid()).set({texto:u.apelido+' entrou no time',ic:'👋',ts:Date.now()})}
+  if(!MY.some(x=>x.id===tid))MY.push({id:tid,nome:d.nome});UI.tab='inicio';openTeam(tid)},
+ jogo(v){const t=team(),m=UI.modal,ts=new Date(v.d+'T'+v.h).getTime();if(isNaN(ts))return toast('Data ou horário inválido.',1);
+  let prazo=v.pd?new Date(v.pd+'T'+(v.ph||'18:00')).getTime():ts-2*3600e3;if(isNaN(prazo)||prazo>ts)prazo=ts-2*3600e3;
+  const base={ts,local:v.local.trim(),adv:(v.adv||'').trim(),vagas:Math.max(1,+v.vagas||t.vagas),prazo};
+  if(m.j)Object.assign(t.jogos.find(q=>q.id===m.j),base);else{t.jogos.push(Object.assign({id:nid(),fase:'agendado',pres:{},gols:{},contra:0,notas:{},jogada:{},times:null},base));log(`Jogo marcado: ${dd(ts)} às ${hh(ts)} em ${base.local}. Confirmar até ${dt(prazo)}`,'📅')}
+  UI.modal=null;save();render()},
+ sorteio(v,fd){const m=UI.modal,j=m.j&&team().jogos.find(q=>q.id===m.j),uids=j?part(j).map(q=>q.uid):fd.getAll('u'),n=+v.n;if(uids.length<n)return toast('Tem menos jogadores do que times.',1);
+  m.uids=uids;m.n=n;m.eq=!!v.eq;m.res=sortear(uids,n,m.eq);if(j){j.times=m.res;log(`Times sorteados para o jogo de ${dd(j.ts)}`,'🎲')}save();render()},
+ lanc(v){const val=num(v.valor);if(!(val>0))return toast('Informe um valor maior que zero.',1);const tp=UI.modal.tp;team().caixa.push({id:nid(),tipo:tp,desc:v.desc.trim(),valor:val,ts:Date.now(),autor:me().id});log(`${tp==='entrada'?'Entrada':'Saída'} no caixa: ${v.desc.trim()} (${money(val)}) por ${nome(me().id)}`,tp==='entrada'?'➕':'➖');UI.modal=null;save();render()},
+ cartao(v){if(!v.alvo)return;team().cartoes.push({id:nid(),alvo:v.alvo,tipo:v.tipo,motivo:v.motivo.trim(),autor:me().id,votos:{},status:'aberta',ts:Date.now()});log(`${nome(me().id)} abriu votação de cartão ${v.tipo} para ${nome(v.alvo)}`,v.tipo==='amarelo'?'🟨':'🟥');UI.modal=null;save();render()},
+ membro(v){const q=mem_(UI.modal.u);q.nome=v.nome.trim();if(v.papel)q.papel=v.papel;UI.modal=null;save();render()},
+ aviso(v){team().avisos.push({id:nid(),texto:v.t.trim(),fixo:!!v.fixo,autor:me().id,ts:Date.now()});log(`Novo aviso de ${nome(me().id)}`,'📢');save();render()},
+ chat(v){const t=v.t.trim();if(!t)return;team().chat.push({id:nid(),uid:me().id,texto:t,ts:Date.now()});UI.busca='';save();render('#chatin')},
+ avulso(v){const n=v.nome.trim();if(!n)return;team().membros.push({uid:'p_'+nid(),nome:n,papel:'jogador',pos:'',semConta:true,desde:Date.now()});log(n+' foi adicionado ao elenco','👤');save();render()},
+ config(v){const t=team();t.nome=v.nome.trim();t.mens=num(v.mens)||0;t.venc=Math.min(31,Math.max(1,+v.venc||10));t.vagas=Math.max(1,+v.vagas||10);t.regras=v.regras;save();render();toast('Configurações salvas.')},
+ perfil(v){const m=mem_(me().id);m.nome=v.apelido.trim();m.pos=v.pos;save();render();toast('Salvo.')},
+ async senha(v){if(v.n.length<6)return toast('Senha com no mínimo 6 caracteres.',1);const u=auth.currentUser;await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email,v.a));await u.updatePassword(v.n);render();toast('Senha trocada.')}
+};
+document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el||el.disabled)return;if(el.dataset.a!=='fundo'&&e.target.closest('label,select,input,textarea')&&!el.matches('button'))return;const f=A[el.dataset.a];if(f)f(el.dataset,el,e)});
+document.addEventListener('submit',e=>{const fm=e.target.closest('form[data-f]');if(!fm)return;e.preventDefault();if(BUSY)return;const fd=new FormData(fm),v={};fd.forEach((x,k)=>v[k]=x);let r;try{r=F[fm.dataset.f](v,fd)}catch(x){return erro(x)}if(r&&r.then){BUSY=true;r.catch(erro).then(()=>{BUSY=false})}});
+document.addEventListener('change',e=>{const el=e.target;
+  if(el.dataset.file==='pagar'&&el.files&&el.files[0]){const f=el.files[0],d=el.dataset;if(!/^image\//.test(f.type))return toast('Envie uma foto ou print do comprovante.',1);comprimir(f).then(c=>darBaixa(d.u,d.m,c),()=>toast('Não consegui ler esta imagem.',1));return}
+  if(el.dataset.ch==='nota'){const j=team().jogos.find(q=>q.id===el.dataset.j),eu=me().id;j.notas[eu]=j.notas[eu]||{};if(el.value==='')delete j.notas[eu][el.dataset.u];else j.notas[eu][el.dataset.u]=+el.value;save();render()}
+  if(el.dataset.ch==='jogada'){const j=team().jogos.find(q=>q.id===el.dataset.j);if(el.value)j.jogada[me().id]=el.value;else delete j.jogada[me().id];save();render()}});
+document.addEventListener('input',e=>{if(e.target.dataset.in==='busca'){UI.busca=e.target.value;const c=$('#chatlist'),l=$('#linha');if(c)c.innerHTML=chatItens();if(l)l.innerHTML=linhaItens()}});
+render();
+auth.onAuthStateChanged(async u=>{closeTeam();if(!u){ME=null;MY=[];BOOT=false;render();return}BOOT=true;render();
+  try{const ur=fs.collection('users').doc(u.uid),s=await ur.get();let d=s.exists?s.data():null;
+    if(!d){d=Object.assign({nome:u.email,apelido:u.email.split('@')[0]},PEND||{},{email:u.email,criado:Date.now()});await ur.set(d)}PEND=null;
+    ME=Object.assign({},d,{id:u.uid});const q=await fs.collection('teams').where('uids','array-contains',u.uid).get();MY=q.docs.map(x=>({id:x.id,nome:x.data().nome}));BOOT=false;
+    const alvo=ME.ultimo&&MY.some(t=>t.id===ME.ultimo)?ME.ultimo:(MY.length===1?MY[0].id:null);if(alvo)openTeam(alvo);else render()}
+  catch(e){BOOT=false;erro(e);render()}});
+</script>
+</body>
+</html>
